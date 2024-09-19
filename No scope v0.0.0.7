@@ -47,9 +47,9 @@ UpdateLabel("Initializing Script... ⏳", 1)
 -- Function to simulate loading with steps and notify when complete
 local function LoadComponent(componentName, totalSteps, stepSize, icon)
     for i = 0, totalSteps, stepSize do
-        UpdateLabel("Loading " .. componentName .. "... ("..i.."/"..totalSteps..") " .. icon, 0.3)
+        UpdateLabel("Loading " .. componentName .. "... ("..i.."/"..totalSteps..") " .. icon, 0.1)
     end
-    UpdateLabel("Loading " .. componentName .. "... ("..totalSteps.."/"..totalSteps..") " .. icon, 0.3)
+    UpdateLabel("Loading " .. componentName .. "... ("..totalSteps.."/"..totalSteps..") " .. icon, 0.1)
     l:Notify(componentName .. " " .. icon, "Successfully Loaded!", 3)
     UpdateLabel(componentName .. " Load Finished " .. icon, 1)
 end
@@ -63,9 +63,6 @@ LoadComponent("ServerStorage Game", 1934, 160, "🔩")
 UpdateLabel("Finalizing Script Setup... ✔", 1)
 UpdateLabel("Script Loaded Successfully! 🎉", 1)
 l:Notify("Script Completed 🎉", "All components successfully loaded!", 5)
-
--- Wait 3 seconds, then remove the loading tab and label
-wait(3)
 DeleteTab(CheckLoading)
 
 -- Add the "Logs" tab after 1 second delay
