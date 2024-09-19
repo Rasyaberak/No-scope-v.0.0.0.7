@@ -1026,93 +1026,154 @@ end
 AddButton(Main, {
     Name = "Esp Highlight",
     Callback = function()
-        local CoreGui = game:GetService("CoreGui")
-        local Players = game:GetService("Players")
+        local espEnabled = true -- Toggle ESP on/off
+        local settings = {
+            fillTransparency = 0.5,
+            outlineColor = Color3.fromRGB(255, 255, 255),
+            outlineTransparency = 0,
+            depthMode = "AlwaysOnTop",
+            distanceCheckInterval = 0.1, -- Check distance every 0.1 seconds (throttling for performance)
+            proximityRanges = {
+                {maxDistance = 20, color = Color3.fromRGB(65, 255, 0)},  -- Green for close
+                {maxDistance = 50, color = Color3.fromRGB(255, 165, 0)}, -- Orange for medium range
+                {maxDistance = math.huge, color = Color3.fromRGB(255, 0, 0)} -- Red for far
+            },
+            fadeEffect = true, -- Option to enable/disable fade effect
+            fadeSpeed = 0.05, -- Speed at which the highlight fades
+            distanceIndicator = true, -- Toggle distance indicator above player
+            customPlayerTag = "Enemy" -- Custom text to appear above players' heads
+        }
+
+        local CoreGui = game:FindService("CoreGui")
+        local Players = game:FindService("Players")
         local RunService = game:GetService("RunService")
         local lp = Players.LocalPlayer
         local connections = {}
 
-        -- Clean any previous highlights
-        if CoreGui:FindFirstChild("Highlight_Storage") then
-            CoreGui.Highlight_Storage:Destroy()
+        local Storage = CoreGui:FindFirstChild("Highlight_Storage") or Instance.new("Folder")
+        Storage.Name = "Highlight_Storage"
+        Storage.Parent = CoreGui
+
+        -- Create highlight for a player
+        local function CreateHighlight(plr)
+            local highlight = Instance.new("Highlight")
+            highlight.Name = plr.Name
+            highlight.FillTransparency = settings.fillTransparency
+            highlight.OutlineColor = settings.outlineColor
+            highlight.OutlineTransparency = settings.outlineTransparency
+            highlight.DepthMode = settings.depthMode
+            highlight.Parent = Storage
+
+            return highlight
         end
 
-        -- Create a storage folder for highlights
-        local Storage = Instance.new("Folder")
-        Storage.Parent = CoreGui
-        Storage.Name = "Highlight_Storage"
+        -- Create a billboard for showing distance and custom tags
+        local function CreateBillboard(plr)
+            local billboard = Instance.new("BillboardGui")
+            billboard.Adornee = plr.Character and plr.Character:FindFirstChild("Head")
+            billboard.Size = UDim2.new(0, 200, 0, 50)
+            billboard.StudsOffset = Vector3.new(0, 3, 0)
+            billboard.AlwaysOnTop = true
 
-        -- Function to update highlight color based on proximity
-        local function UpdateHighlightColor(Highlight, distance)
-            if distance < 20 then
-                Highlight.FillColor = Color3.fromRGB(65, 255, 0) -- Green for close range
-            elseif distance < 50 then
-                Highlight.FillColor = Color3.fromRGB(255, 165, 0) -- Orange for medium range
-            else
-                Highlight.FillColor = Color3.fromRGB(255, 0, 0) -- Red for far away
+            local textLabel = Instance.new("TextLabel")
+            textLabel.Parent = billboard
+            textLabel.Size = UDim2.new(1, 0, 1, 0)
+            textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+            textLabel.BackgroundTransparency = 1
+            textLabel.TextScaled = true
+            textLabel.Font = Enum.Font.SourceSansBold
+            textLabel.Text = settings.customPlayerTag
+
+            billboard.Parent = plr.Character and plr.Character:FindFirstChild("Head")
+            return billboard
+        end
+
+        -- Update the color of the highlight based on proximity
+        local function UpdateHighlightColor(highlight, distance)
+            for _, range in ipairs(settings.proximityRanges) do
+                if distance <= range.maxDistance then
+                    if settings.fadeEffect then
+                        highlight.FillColor = highlight.FillColor:Lerp(range.color, settings.fadeSpeed)
+                    else
+                        highlight.FillColor = range.color
+                    end
+                    break
+                end
             end
         end
 
-        -- Function to create a highlight for each player
-        local function HighlightPlayer(plr)
-            if plr == lp then return end -- Skip local player
+        -- Handle character setup for highlight
+        local function SetupCharacterHighlight(plr)
+            local highlight = CreateHighlight(plr)
+            local billboard = settings.distanceIndicator and CreateBillboard(plr) or nil
 
-            local Highlight = Instance.new("Highlight")
-            Highlight.Name = plr.Name
-            Highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-            Highlight.FillTransparency = 0.5
-            Highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
-            Highlight.OutlineTransparency = 0
-            Highlight.Parent = Storage
-
-            -- Update highlight adornee to player character
             local function UpdateAdornee(char)
                 if char and char:FindFirstChild("HumanoidRootPart") then
-                    Highlight.Adornee = char
+                    highlight.Adornee = char
+                end
+                if billboard then
+                    billboard.Adornee = char:FindFirstChild("Head")
                 end
             end
 
-            UpdateAdornee(plr.Character) -- Set initial adornee
+            -- Update adornee when player respawns
+            connections[plr] = plr.CharacterAdded:Connect(UpdateAdornee)
 
-            -- Connect to the CharacterAdded event for when the player respawns
-            connections[plr] = plr.CharacterAdded:Connect(function(char)
-                UpdateAdornee(char)
-            end)
+            -- Set initial adornee
+            if plr.Character then
+                UpdateAdornee(plr.Character)
+            end
 
-            -- Constantly update color based on distance
-            local distanceConnection = RunService.Heartbeat:Connect(function()
-                if plr.Character and lp.Character and plr.Character:FindFirstChild("HumanoidRootPart") and lp.Character:FindFirstChild("HumanoidRootPart") then
+            -- Continuously update distance, color, and distance label
+            local lastDistance = nil
+            connections[plr].distanceConnection = RunService.Heartbeat:Connect(function()
+                if espEnabled and lp.Character and plr.Character and lp.Character:FindFirstChild("HumanoidRootPart") and plr.Character:FindFirstChild("HumanoidRootPart") then
                     local distance = (lp.Character.HumanoidRootPart.Position - plr.Character.HumanoidRootPart.Position).Magnitude
-                    UpdateHighlightColor(Highlight, distance)
+                    if not lastDistance or math.abs(lastDistance - distance) > 2 then
+                        UpdateHighlightColor(highlight, distance)
+                        lastDistance = distance
+
+                        if billboard then
+                            billboard.TextLabel.Text = settings.customPlayerTag .. " | " .. math.floor(distance) .. " studs"
+                        end
+                    end
                 end
             end)
-
-            -- Store connections
-            connections[plr] = {characterConnection = connections[plr], distanceConnection = distanceConnection}
         end
 
-        -- Function to clean up when a player leaves
-        local function CleanupHighlight(plr)
+        -- Clean up connections and highlights
+        local function CleanupPlayer(plr)
             if Storage:FindFirstChild(plr.Name) then
                 Storage[plr.Name]:Destroy()
             end
             if connections[plr] then
-                connections[plr].characterConnection:Disconnect()
-                connections[plr].distanceConnection:Disconnect()
+                if connections[plr].distanceConnection then
+                    connections[plr].distanceConnection:Disconnect()
+                end
+                if connections[plr].CharacterAdded then
+                    connections[plr].CharacterAdded:Disconnect()
+                end
                 connections[plr] = nil
             end
         end
 
-        -- Handle existing players
+        -- Apply highlight to all existing players
         for _, v in ipairs(Players:GetPlayers()) do
-            HighlightPlayer(v)
+            SetupCharacterHighlight(v)
         end
 
-        -- Handle new players joining
-        Players.PlayerAdded:Connect(HighlightPlayer)
+        -- Setup highlights for new players
+        Players.PlayerAdded:Connect(SetupCharacterHighlight)
 
-        -- Handle players leaving
-        Players.PlayerRemoving:Connect(CleanupHighlight)
+        -- Clean up highlights for players who leave
+        Players.PlayerRemoving:Connect(CleanupPlayer)
+
+        -- Auto cleanup when script is disabled
+        game:GetService("StarterGui").Reset.OnClientEvent:Connect(function()
+            for _, plr in ipairs(Players:GetPlayers()) do
+                CleanupPlayer(plr)
+            end
+        end)
     end
 })
 
