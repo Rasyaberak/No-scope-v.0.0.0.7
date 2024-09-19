@@ -1025,58 +1025,88 @@ end
 })
 
 AddButton(Main, {
-  Name = "Esp Highlight",
-  Callback = function()
- local FillColor = Color3.fromRGB(65,255,0)
-local DepthMode = "AlwaysOnTop"
-local FillTransparency = 0.5
-local OutlineColor = Color3.fromRGB(255,255,255)
-local OutlineTransparency = 0
+    Name = "Esp Highlight",
+    Callback = function()
+        local FillColor = Color3.fromRGB(65, 255, 0) -- Default green for close range
+        local DepthMode = "AlwaysOnTop"
+        local FillTransparency = 0.5
+        local OutlineColor = Color3.fromRGB(255, 255, 255)
+        local OutlineTransparency = 0
 
-local CoreGui = game:FindService("CoreGui")
-local Players = game:FindService("Players")
-local lp = Players.LocalPlayer
-local connections = {}
+        local CoreGui = game:FindService("CoreGui")
+        local Players = game:FindService("Players")
+        local lp = Players.LocalPlayer
+        local connections = {}
 
-local Storage = Instance.new("Folder")
-Storage.Parent = CoreGui
-Storage.Name = "Highlight_Storage"
+        local Storage = Instance.new("Folder")
+        Storage.Parent = CoreGui
+        Storage.Name = "Highlight_Storage"
 
-local function Highlight(plr)
-    local Highlight = Instance.new("Highlight")
-    Highlight.Name = plr.Name
-    Highlight.FillColor = FillColor
-    Highlight.DepthMode = DepthMode
-    Highlight.FillTransparency = FillTransparency
-    Highlight.OutlineColor = OutlineColor
-    Highlight.OutlineTransparency = 0
-    Highlight.Parent = Storage
+        local function UpdateHighlightColor(Highlight, distance)
+            if distance < 20 then
+                Highlight.FillColor = Color3.fromRGB(65, 255, 0) -- Green for close
+            elseif distance < 50 then
+                Highlight.FillColor = Color3.fromRGB(255, 165, 0) -- Orange for medium range
+            else
+                Highlight.FillColor = Color3.fromRGB(255, 0, 0) -- Red for far away
+            end
+        end
 
-    local plrchar = plr.Character
-    if plrchar then
-        Highlight.Adornee = plrchar
+        local function Highlight(plr)
+            local Highlight = Instance.new("Highlight")
+            Highlight.Name = plr.Name
+            Highlight.FillColor = FillColor
+            Highlight.DepthMode = DepthMode
+            Highlight.FillTransparency = FillTransparency
+            Highlight.OutlineColor = OutlineColor
+            Highlight.OutlineTransparency = OutlineTransparency
+            Highlight.Parent = Storage
+
+            local function UpdateAdornee(char)
+                if char then
+                    Highlight.Adornee = char
+                end
+            end
+
+            -- Set the initial Adornee to the player's character
+            UpdateAdornee(plr.Character)
+
+            -- Update Adornee when the player's character respawns
+            connections[plr] = plr.CharacterAdded:Connect(function(char)
+                UpdateAdornee(char)
+            end)
+
+            -- Constantly update the color based on distance
+            local distanceConnection
+            distanceConnection = game:GetService("RunService").Heartbeat:Connect(function()
+                if plr and plr.Character and lp and lp.Character then
+                    local distance = (lp.Character.HumanoidRootPart.Position - plr.Character.HumanoidRootPart.Position).Magnitude
+                    UpdateHighlightColor(Highlight, distance)
+                end
+            end)
+
+            -- Store connection so it can be cleaned up later
+            connections[plr] = {characterConnection = connections[plr], distanceConnection = distanceConnection}
+        end
+
+        Players.PlayerAdded:Connect(Highlight)
+
+        for i, v in next, Players:GetPlayers() do
+            Highlight(v)
+        end
+
+        Players.PlayerRemoving:Connect(function(plr)
+            if Storage:FindFirstChild(plr.Name) then
+                Storage[plr.Name]:Destroy()
+            end
+            if connections[plr] then
+                -- Disconnect both CharacterAdded and distance updates
+                connections[plr].characterConnection:Disconnect()
+                connections[plr].distanceConnection:Disconnect()
+                connections[plr] = nil
+            end
+        end)
     end
-
-    connections[plr] = plr.CharacterAdded:Connect(function(char)
-        Highlight.Adornee = char
-    end)
-end
-
-Players.PlayerAdded:Connect(Highlight)
-for i,v in next, Players:GetPlayers() do
-    Highlight(v)
-end
-
-Players.PlayerRemoving:Connect(function(plr)
-    local plrname = plr.Name
-    if Storage[plrname] then
-        Storage[plrname]:Destroy()
-    end
-    if connections[plr] then
-        connections[plr]:Disconnect()
-    end
-end)
-end
 })
 
 local Main = MakeTab({Name = "Extras"})
