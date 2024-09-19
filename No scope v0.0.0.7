@@ -28,404 +28,44 @@ MakeWindow({
   }
 })
 
-local Main = MakeTab({Name = "Logs"})
+-- Initialize the tab and label for updates
+local Main = MakeTab({Name = "Loading Status"})
+local Label = AddTextLabel(Main, "Initializing...")
 
-local Label = AddTextLabel(Main, "a")
-SetLabel(Label, "Script Made by Projeto LKB")
-wait(1)
-SetLabel(Label, "Check User... 🔎")
-wait(1)
-SetLabel(Label, "Check Player... 👤")
-wait(1)
--- Start with the waiting message
-SetLabel(Label, "Waiting To Loading Script!!")
+-- Function to update the label and delay between stages
+local function UpdateLabel(text, duration)
+    SetLabel(Label, text)
+    wait(duration)
+end
 
--- Simulate the loading process for the different scripts
-wait(1)
-SetLabel(Label, "Loading Workspace Script... (0/12783) 🌍")
-wait(1)
-SetLabel(Label, "Loading Workspace Script... (1/12783) 🌍")
-wait(0.5)
-SetLabel(Label, "Loading Workspace Script... (2/12783) 🌍")
-wait(0.5)
-SetLabel(Label, "Loading Workspace Script... (3/12783) 🌍")
-wait(0.5)
-SetLabel(Label, "Loading Workspace Script... (4/12783) 🌍")
-wait(0.5)
-SetLabel(Label, "Loading Workspace Script... (5/12783) 🌍")
-wait(0.5)
-SetLabel(Label, "Loading Workspace Script... (6/12783) 🌍")
-wait(0.5)
-SetLabel(Label, "Loading Workspace Script... (7/12783) 🌍")
-wait(0.5)
-SetLabel(Label, "Loading Workspace Script... (8/12783) 🌍")
-wait(0.5)
-SetLabel(Label, "Loading Workspace Script... (10/12783) 🌍")
-wait(0.1)
-SetLabel(Label, "Loading Workspace Script... (18/12783) 🌍")
-wait(0.1)
-SetLabel(Label, "Loading Workspace Script... (35/12783) 🌍")
-wait(0.1)
-SetLabel(Label, "Loading Workspace Script... (48/12783) 🌍")
-wait(0.1)
-SetLabel(Label, "Loading Workspace Script... (59/12783) 🌍")
-wait(0.1)
-SetLabel(Label, "Loading Workspace Script... (60/12783) 🌍")
-wait(0.1)
-SetLabel(Label, "Loading Workspace Script... (85/12783) 🌍")
-wait(0.1)
-SetLabel(Label, "Loading Workspace Script... (150/12783) 🌍")
-wait(0.1)
-SetLabel(Label, "Loading Workspace Script... (350/12783) 🌍")
-wait(0.1)
-SetLabel(Label, "Loading Workspace Script... (480/12783) 🌍")
-wait(0.1)
-SetLabel(Label, "Loading Workspace Script... (580/12783) 🌍")
-wait(0.1)
-SetLabel(Label, "Loading Workspace Script... (730/12783) 🌍")
-wait(0.1)
-SetLabel(Label, "Loading Workspace Script... (840/12783) 🌍")
-wait(0.1)
-SetLabel(Label, "Loading Workspace Script... (894/12783) 🌍")
-wait(0.1)
-SetLabel(Label, "Loading Workspace Script... (960/12783) 🌍")
-wait(0.1)
-SetLabel(Label, "Loading Workspace Script... (1050/12783) 🌍")
-wait(0.1)
-SetLabel(Label, "Loading Workspace Script... (1293/12783) 🌍")
-wait(0.1)
-SetLabel(Label, "Loading Workspace Script... (1440/12783) 🌍")
-wait(0.1)
-SetLabel(Label, "Loading Workspace Script... (1594/12783) 🌍")
-wait(0.1)
-SetLabel(Label, "Loading Workspace Script... (1670/12783) 🌍")
-wait(0.1)
-SetLabel(Label, "Loading Workspace Script... (1854/12783) 🌍")
-wait(0.1)
-SetLabel(Label, "Loading Workspace Script... (2384/12783) 🌍")
-wait(0.1)
-SetLabel(Label, "Loading Workspace Script... (2845/12783) 🌍")
-wait(0.1)
-SetLabel(Label, "Loading Workspace Script... (3285/12783) 🌍")
-wait(0.1)
-SetLabel(Label, "Loading Workspace Script... (3794/12783) 🌍")
-wait(0.1)
-SetLabel(Label, "Loading Workspace Script... (4295/12783) 🌍")
-wait(0.1)
-SetLabel(Label, "Loading Workspace Script... (4479/12783) 🌍")
-wait(0.1)
-SetLabel(Label, "Loading Workspace Script... (4953/12783) 🌍")
-wait(0.1)
-SetLabel(Label, "Loading Workspace Script... (5432/12783) 🌍")
-wait(0.1)
-SetLabel(Label, "Loading Workspace Script... (5948/12783) 🌍")
-wait(0.1)
-SetLabel(Label, "Loading Workspace Script... (6294/12783) 🌍")
-wait(0.1)
-SetLabel(Label, "Loading Workspace Script... (6495/12783) 🌍")
-wait(0.1)
-SetLabel(Label, "Loading Workspace Script... (6854/12783) 🌍")
-wait(0.1)
-SetLabel(Label, "Loading Workspace Script... (7853/12783) 🌍")
-wait(0.1)
-SetLabel(Label, "Loading Workspace Script... (8593/12783) 🌍")
-wait(0.1)
-SetLabel(Label, "Loading Workspace Script... (9358/12783) 🌍")
-wait(0.1)
-SetLabel(Label, "Loading Workspace Script... (10794/12783) 🌍")
-wait(0.1)
-SetLabel(Label, "Loading Workspace Script... (11234/12783) 🌍")
-wait(0.1)
-SetLabel(Label, "Loading Workspace Script... (11942/12783) 🌍")
-wait(0.1)
-l:Notify("Workspace 🌍","Success Load !",3)
-wait(0.1)
-SetLabel(Label, "Workspace Script Finish 🌍")
-wait(1)
-SetLabel(Label, "Loading ReplicatedStorange Script... (0/3853) 🛠")
-wait(1)
-SetLabel(Label, "Loading ReplicatedStorange Script... (1/3853) 🛠")
-wait(0.5)
-SetLabel(Label, "Loading ReplicatedStorange Script... (2/3853) 🛠")
-wait(0.5)
-SetLabel(Label, "Loading ReplicatedStorange Script... (3/3853) 🛠")
-wait(0.5)
-SetLabel(Label, "Loading ReplicatedStorange Script... (4/3853) 🛠")
-wait(0.5)
-SetLabel(Label, "Loading ReplicatedStorange Script... (5/3853) 🛠")
-wait(0.5)
-SetLabel(Label, "Loading ReplicatedStorange Script... (6/3853) 🛠")
-wait(0.5)
-SetLabel(Label, "Loading ReplicatedStorange Script... (7/3853) 🛠")
-wait(0.5)
-SetLabel(Label, "Loading ReplicatedStorange Script... (8/3853) 🛠")
-wait(0.5)
-SetLabel(Label, "Loading ReplicatedStorange Script... (9/3853) 🛠")
-wait(0.5)
-SetLabel(Label, "Loading ReplicatedStorange Script... (10/3853) 🛠")
-wait(0.5)
-SetLabel(Label, "Loading ReplicatedStorange Script... (15/3853) 🛠")
-wait(0.1)
-SetLabel(Label, "Loading ReplicatedStorange Script... (23/3853) 🛠")
-wait(0.1)
-SetLabel(Label, "Loading ReplicatedStorange Script... (48/3853) 🛠")
-wait(0.1)
-SetLabel(Label, "Loading ReplicatedStorange Script... (78/3853) 🛠")
-wait(0.1)
-SetLabel(Label, "Loading ReplicatedStorange Script... (95/3853) 🛠")
-wait(0.1)
-SetLabel(Label, "Loading ReplicatedStorange Script... (110/3853) 🛠")
-wait(0.1)
-SetLabel(Label, "Loading ReplicatedStorange Script... (250/3853) 🛠")
-wait(0.1)
-SetLabel(Label, "Loading ReplicatedStorange Script... (340/3853) 🛠")
-wait(0.1)
-SetLabel(Label, "Loading ReplicatedStorange Script... (401/3853) 🛠")
-wait(0.1)
-SetLabel(Label, "Loading ReplicatedStorange Script... (495/3853) 🛠")
-wait(0.1)
-SetLabel(Label, "Loading ReplicatedStorange Script... (796/3853) 🛠")
-wait(0.1)
-SetLabel(Label, "Loading ReplicatedStorange Script... (934/3853) 🛠")
-wait(0.1)
-SetLabel(Label, "Loading ReplicatedStorange Script... (1293/3853) 🛠")
-wait(0.1)
-SetLabel(Label, "Loading ReplicatedStorange Script... (1584/3853) 🛠")
-wait(0.1)
-SetLabel(Label, "Loading ReplicatedStorange Script... (1854/3853) 🛠")
-wait(0.1)
-SetLabel(Label, "Loading ReplicatedStorange Script... (2293/3853) 🛠")
-wait(0.1)
-SetLabel(Label, "Loading ReplicatedStorange Script... (2594/3853) 🛠")
-wait(0.1)
-SetLabel(Label, "Loading ReplicatedStorange Script... (2854/3853) 🛠")
-wait(0.1)
-SetLabel(Label, "Loading ReplicatedStorange Script... (3294/3853) 🛠")
-wait(0.1)
-SetLabel(Label, "Loading ReplicatedStorange Script... (3594/3853) 🛠")
-wait(0.1)
-SetLabel(Label, "Loading ReplicatedStorange Script... (3853/3853) 🛠")
-wait(0.1)
-l:Notify("ReplicatedStorange 🛠","Success Load !",3)
-wait(0.1)
-SetLabel(Label, "Loading ReplicatedStorange Finish 🛠")
-wait(1)
-SetLabel(Label, "Loading ServerStorange game... (0/1934) 🔩")
-wait(1)
-SetLabel(Label, "Loading ServerStorange game... (1/1934) 🔩")
-wait(0.5)
-SetLabel(Label, "Loading ServerStorange game... (2/1934) 🔩")
-wait(0.5)
-SetLabel(Label, "Loading ServerStorange game... (3/1934) 🔩")
-wait(0.5)
-SetLabel(Label, "Loading ServerStorange game... (4/1934) 🔩")
-wait(0.5)
-SetLabel(Label, "Loading ServerStorange game... (5/1934) 🔩")
-wait(0.5)
-SetLabel(Label, "Loading ServerStorange game... (6/1934) 🔩")
-wait(0.5)
-SetLabel(Label, "Loading ServerStorange game... (7/1934) 🔩")
-wait(0.5)
-SetLabel(Label, "Loading ServerStorange game... (8/1934) 🔩")
-wait(0.5)
-SetLabel(Label, "Loading ServerStorange game... (9/1934) 🔩")
-wait(0.5)
-SetLabel(Label, "Loading ServerStorange game... (10/1934) 🔩")
-wait(0.5)
-SetLabel(Label, "Loading ServerStorange game... (15/1934) 🔩")
-wait(0.1)
-SetLabel(Label, "Loading ServerStorange game... (19/1934) 🔩")
-wait(0.1)
-SetLabel(Label, "Loading ServerStorange game... (27/1934) 🔩")
-wait(0.1)
-SetLabel(Label, "Loading ServerStorange game... (35/1934) 🔩")
-wait(0.1)
-SetLabel(Label, "Loading ServerStorange game... (41/1934) 🔩")
-wait(0.1)
-SetLabel(Label, "Loading ServerStorange game... (48/1934) 🔩")
-wait(0.1)
-SetLabel(Label, "Loading ServerStorange game... (55/1934) 🔩")
-wait(0.1)
-SetLabel(Label, "Loading ServerStorange game... (60/1934) 🔩")
-wait(0.1)
-SetLabel(Label, "Loading ServerStorange game... (75/1934) 🔩")
-wait(0.1)
-SetLabel(Label, "Loading ServerStorange game... (84/1934) 🔩")
-wait(0.1)
-SetLabel(Label, "Loading ServerStorange game... (95/1934) 🔩")
-wait(0.1)
-SetLabel(Label, "Loading ServerStorange game... (110/1934) 🔩")
-wait(0.1)
-SetLabel(Label, "Loading ServerStorange game... (140/1934) 🔩")
-wait(0.1)
-SetLabel(Label, "Loading ServerStorange game... (190/1934) 🔩")
-wait(0.1)
-SetLabel(Label, "Loading ServerStorange game... (230/1934) 🔩")
-wait(0.1)
-SetLabel(Label, "Loading ServerStorange game... (340/1934) 🔩")
-wait(0.1)
-SetLabel(Label, "Loading ServerStorange game... (440/1934) 🔩")
-wait(0.1)
-SetLabel(Label, "Loading ServerStorange game... (490/1934) 🔩")
-wait(0.1)
-SetLabel(Label, "Loading ServerStorange game... (530/1934) 🔩")
-wait(0.1)
-SetLabel(Label, "Loading ServerStorange game... (580/1934) 🔩")
-wait(0.1)
-SetLabel(Label, "Loading ServerStorange game... (630/1934) 🔩")
-wait(0.1)
-SetLabel(Label, "Loading ServerStorange game... (680/1934) 🔩")
-wait(0.1)
-SetLabel(Label, "Loading ServerStorange game... (720/1934) 🔩")
-wait(0.1)
-SetLabel(Label, "Loading ServerStorange game... (730/1934) 🔩")
-wait(0.1)
-SetLabel(Label, "Loading ServerStorange game... (765/1934) 🔩")
-wait(0.1)
-SetLabel(Label, "Loading ServerStorange game... (794/1934) 🔩")
-wait(0.1)
-SetLabel(Label, "Loading ServerStorange game... (928/1934) 🔩")
-wait(0.1)
-SetLabel(Label, "Loading ServerStorange game... (1293/1934) 🔩")
-wait(0.1)
-SetLabel(Label, "Loading ServerStorange game... (1384/1934) 🔩")
-wait(0.1)
-SetLabel(Label, "Loading ServerStorange game... (1413/1934) 🔩")
-wait(0.1)
-SetLabel(Label, "Loading ServerStorange game... (1794/1934) 🔩")
-wait(0.1)
-SetLabel(Label, "Loading ServerStorange game... (1934/1934) 🔩")
-wait(0.1)
-l:Notify("ServerStorange 🔩","Success Load !",3)
-wait(0.1)
-SetLabel(Label, "Loading ServerStorange game Finish 🔩")
-wait(1)
-SetLabel(Label, "Loading ServerScript... (0/28439) ⚙")
-wait(1)
-SetLabel(Label, "Loading ServerScript... (1/28439) ⚙")
-wait(0.5)
-SetLabel(Label, "Loading ServerScript... (2/28439) ⚙")
-wait(0.5)
-SetLabel(Label, "Loading ServerScript... (3/28439) ⚙")
-wait(0.5)
-SetLabel(Label, "Loading ServerScript... (4/28439) ⚙")
-wait(0.5)
-SetLabel(Label, "Loading ServerScript... (5/28439) ⚙")
-wait(0.5)
-SetLabel(Label, "Loading ServerScript... (6/28439) ⚙")
-wait(0.5)
-SetLabel(Label, "Loading ServerScript... (7/28439) ⚙")
-wait(0.5)
-SetLabel(Label, "Loading ServerScript... (8/28439) ⚙")
-wait(0.5)
-SetLabel(Label, "Loading ServerScript... (9/28439) ⚙")
-wait(0.5)
-SetLabel(Label, "Loading ServerScript... (10/28439) ⚙")
-wait(0.5)
-SetLabel(Label, "Loading ServerScript... (16/28439) ⚙")
-wait(0.1)
-SetLabel(Label, "Loading ServerScript... (22/28439) ⚙")
-wait(0.1)
-SetLabel(Label, "Loading ServerScript... (29/28439) ⚙")
-wait(0.1)
-SetLabel(Label, "Loading ServerScript... (34/28439) ⚙")
-wait(0.1)
-SetLabel(Label, "Loading ServerScript... (39/28439) ⚙")
-wait(0.1)
-SetLabel(Label, "Loading ServerScript... (44/28439) ⚙")
-wait(0.1)
-SetLabel(Label, "Loading ServerScript... (48/28439) ⚙")
-wait(0.1)
-SetLabel(Label, "Loading ServerScript... (52/28439) ⚙")
-wait(0.1)
-SetLabel(Label, "Loading ServerScript... (58/28439) ⚙")
-wait(0.1)
-SetLabel(Label, "Loading ServerScript... (64/28439) ⚙")
-wait(0.1)
-SetLabel(Label, "Loading ServerScript... (74/28439) ⚙")
-wait(0.1)
-SetLabel(Label, "Loading ServerScript... (95/28439) ⚙")
-wait(0.1)
-SetLabel(Label, "Loading ServerScript... (150/28439) ⚙")
-wait(0.1)
-SetLabel(Label, "Loading ServerScript... (230/28439) ⚙")
-wait(0.1)
-SetLabel(Label, "Loading ServerScript... (340/28439) ⚙")
-wait(0.1)
-SetLabel(Label, "Loading ServerScript... (420/28439) ⚙")
-wait(0.1)
-SetLabel(Label, "Loading ServerScript... (480/28439) ⚙")
-wait(0.1)
-SetLabel(Label, "Loading ServerScript... (520/28439) ⚙")
-wait(0.1)
-SetLabel(Label, "Loading ServerScript... (567/28439) ⚙")
-wait(0.1)
-SetLabel(Label, "Loading ServerScript... (594/28439) ⚙")
-wait(0.1)
-SetLabel(Label, "Loading ServerScript... (895/28439) ⚙")
-wait(0.1)
-SetLabel(Label, "Loading ServerScript... (1029/28439) ⚙")
-wait(0.1)
-SetLabel(Label, "Loading ServerScript... (1293/28439) ⚙")
-wait(0.1)
-SetLabel(Label, "Loading ServerScript... (1594/28439) ⚙")
-wait(0.1)
-SetLabel(Label, "Loading ServerScript... (1859/28439) ⚙")
-wait(0.1)
-SetLabel(Label, "Loading ServerScript... (2203/28439) ⚙")
-wait(0.1)
-SetLabel(Label, "Loading ServerScript... (2594/28439) ⚙")
-wait(0.1)
-SetLabel(Label, "Loading ServerScript... (2902/28439) ⚙")
-wait(0.1)
-SetLabel(Label, "Loading ServerScript... (3294/28439) ⚙")
-wait(0.1)
-SetLabel(Label, "Loading ServerScript... (3472/28439) ⚙")
-wait(0.1)
-SetLabel(Label, "Loading ServerScript... (3743/28439) ⚙")
-wait(0.1)
-SetLabel(Label, "Loading ServerScript... (4395/28439) ⚙")
-wait(0.1)
-SetLabel(Label, "Loading ServerScript... (4783/28439) ⚙")
-wait(0.1)
-SetLabel(Label, "Loading ServerScript... (5275/28439) ⚙")
-wait(0.1)
-SetLabel(Label, "Loading ServerScript... (5834/28439) ⚙")
-wait(0.1)
-SetLabel(Label, "Loading ServerScript... (6594/28439) ⚙")
-wait(0.1)
-SetLabel(Label, "Loading ServerScript... (7594/28439) ⚙")
-wait(0.1)
-SetLabel(Label, "Loading ServerScript... (8923/28439) ⚙")
-wait(0.1)
-SetLabel(Label, "Loading ServerScript... Enabled Turbo Mode... ⚙")
-wait(1)
-SetLabel(Label, "Loading ServerScript... (12945/28439) ⚙")
-wait(0.1)
-SetLabel(Label, "Loading ServerScript... (13945/28439) ⚙")
-wait(0.1)
-SetLabel(Label, "Loading ServerScript... (15943/28439) ⚙")
-wait(0.1)
-SetLabel(Label, "Loading ServerScript... (17954/28439) ⚙")
-wait(0.1)
-SetLabel(Label, "Loading ServerScript... (18954/28439) ⚙")
-wait(0.1)
-SetLabel(Label, "Loading ServerScript... (22949/28439) ⚙")
-wait(0.1)
-SetLabel(Label, "Loading ServerScript... (24494/28439) ⚙")
-wait(0.1)
-SetLabel(Label, "Loading ServerScript... (25495/28439) ⚙")
-wait(0.1)
-SetLabel(Label, "Loading ServerScript... (27493/28439) ⚙")
-wait(0.1)
-SetLabel(Label, "Loading ServerScript... (28439/28439) ⚙")
-wait(0.1)
-l:Notify("ServerScript ⚙","Success Load !",3)
-wait(0.1)
-SetLabel(Label, "Success All Loading :D!!")
+-- Initialize loading sequence
+UpdateLabel("Script Made by Projeto LKB", 1)
+UpdateLabel("Verifying User... 🔎", 1)
+UpdateLabel("Verifying Player Info... 👤", 1)
+UpdateLabel("Initializing Script... ⏳", 1)
 
--- Wait 3 seconds, then delete the message
-wait(3)
+-- Function to simulate loading with steps and notify when complete
+local function LoadComponent(componentName, totalSteps, stepSize, icon)
+    for i = 0, totalSteps, stepSize do
+        UpdateLabel("Loading " .. componentName .. "... ("..i.."/"..totalSteps..") " .. icon, 0.3)
+    end
+    UpdateLabel("Loading " .. componentName .. "... ("..totalSteps.."/"..totalSteps..") " .. icon, 0.3)
+    l:Notify(componentName .. " " .. icon, "Successfully Loaded!", 3)
+    UpdateLabel(componentName .. " Load Finished " .. icon, 1)
+end
+
+-- Simulate loading components
+LoadComponent("Workspace Script", 12783, 1280, "🌍")
+LoadComponent("ReplicatedStorage Script", 3853, 400, "🛠")
+LoadComponent("ServerStorage Game", 1934, 200, "🔩")
+
+-- Finalizing the load
+UpdateLabel("Finalizing Script Setup... ✔", 1)
+UpdateLabel("Script Loaded Successfully! 🎉", 1)
+l:Notify("Script Completed 🎉", "All components successfully loaded!", 5)
+
+-- Final completion
+print("Script loading process completed successfully.")
 
 local Paragraph = AddParagraph(Main, {"Made By Projeto LKA x F Hub", "Current In Beta Script"})
 
@@ -1026,152 +666,83 @@ end
 AddButton(Main, {
     Name = "Esp Highlight",
     Callback = function()
-        local espEnabled = true -- Toggle ESP on/off
-        local settings = {
-            fillTransparency = 0.5,
-            outlineColor = Color3.fromRGB(255, 255, 255),
-            outlineTransparency = 0,
-            depthMode = "AlwaysOnTop",
-            distanceCheckInterval = 0.1, -- Check distance every 0.1 seconds (throttling for performance)
-            proximityRanges = {
-                {maxDistance = 20, color = Color3.fromRGB(65, 255, 0)},  -- Green for close
-                {maxDistance = 50, color = Color3.fromRGB(255, 165, 0)}, -- Orange for medium range
-                {maxDistance = math.huge, color = Color3.fromRGB(255, 0, 0)} -- Red for far
-            },
-            fadeEffect = true, -- Option to enable/disable fade effect
-            fadeSpeed = 0.05, -- Speed at which the highlight fades
-            distanceIndicator = true, -- Toggle distance indicator above player
-            customPlayerTag = "Enemy" -- Custom text to appear above players' heads
-        }
+        local FillColor = Color3.fromRGB(65, 255, 0) -- Default green for close range
+        local DepthMode = "AlwaysOnTop"
+        local FillTransparency = 0.5
+        local OutlineColor = Color3.fromRGB(255, 255, 255)
+        local OutlineTransparency = 0
 
         local CoreGui = game:FindService("CoreGui")
         local Players = game:FindService("Players")
-        local RunService = game:GetService("RunService")
         local lp = Players.LocalPlayer
         local connections = {}
 
-        local Storage = CoreGui:FindFirstChild("Highlight_Storage") or Instance.new("Folder")
-        Storage.Name = "Highlight_Storage"
+        local Storage = Instance.new("Folder")
         Storage.Parent = CoreGui
+        Storage.Name = "Highlight_Storage"
 
-        -- Create highlight for a player
-        local function CreateHighlight(plr)
-            local highlight = Instance.new("Highlight")
-            highlight.Name = plr.Name
-            highlight.FillTransparency = settings.fillTransparency
-            highlight.OutlineColor = settings.outlineColor
-            highlight.OutlineTransparency = settings.outlineTransparency
-            highlight.DepthMode = settings.depthMode
-            highlight.Parent = Storage
-
-            return highlight
-        end
-
-        -- Create a billboard for showing distance and custom tags
-        local function CreateBillboard(plr)
-            local billboard = Instance.new("BillboardGui")
-            billboard.Adornee = plr.Character and plr.Character:FindFirstChild("Head")
-            billboard.Size = UDim2.new(0, 200, 0, 50)
-            billboard.StudsOffset = Vector3.new(0, 3, 0)
-            billboard.AlwaysOnTop = true
-
-            local textLabel = Instance.new("TextLabel")
-            textLabel.Parent = billboard
-            textLabel.Size = UDim2.new(1, 0, 1, 0)
-            textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-            textLabel.BackgroundTransparency = 1
-            textLabel.TextScaled = true
-            textLabel.Font = Enum.Font.SourceSansBold
-            textLabel.Text = settings.customPlayerTag
-
-            billboard.Parent = plr.Character and plr.Character:FindFirstChild("Head")
-            return billboard
-        end
-
-        -- Update the color of the highlight based on proximity
-        local function UpdateHighlightColor(highlight, distance)
-            for _, range in ipairs(settings.proximityRanges) do
-                if distance <= range.maxDistance then
-                    if settings.fadeEffect then
-                        highlight.FillColor = highlight.FillColor:Lerp(range.color, settings.fadeSpeed)
-                    else
-                        highlight.FillColor = range.color
-                    end
-                    break
-                end
+        local function UpdateHighlightColor(Highlight, distance)
+            if distance < 20 then
+                Highlight.FillColor = Color3.fromRGB(65, 255, 0) -- Green for close
+            elseif distance < 50 then
+                Highlight.FillColor = Color3.fromRGB(255, 165, 0) -- Orange for medium range
+            else
+                Highlight.FillColor = Color3.fromRGB(255, 0, 0) -- Red for far away
             end
         end
 
-        -- Handle character setup for highlight
-        local function SetupCharacterHighlight(plr)
-            local highlight = CreateHighlight(plr)
-            local billboard = settings.distanceIndicator and CreateBillboard(plr) or nil
+        local function Highlight(plr)
+            local Highlight = Instance.new("Highlight")
+            Highlight.Name = plr.Name
+            Highlight.FillColor = FillColor
+            Highlight.DepthMode = DepthMode
+            Highlight.FillTransparency = FillTransparency
+            Highlight.OutlineColor = OutlineColor
+            Highlight.OutlineTransparency = OutlineTransparency
+            Highlight.Parent = Storage
 
             local function UpdateAdornee(char)
-                if char and char:FindFirstChild("HumanoidRootPart") then
-                    highlight.Adornee = char
-                end
-                if billboard then
-                    billboard.Adornee = char:FindFirstChild("Head")
+                if char then
+                    Highlight.Adornee = char
                 end
             end
 
-            -- Update adornee when player respawns
-            connections[plr] = plr.CharacterAdded:Connect(UpdateAdornee)
+            -- Set the initial Adornee to the player's character
+            UpdateAdornee(plr.Character)
 
-            -- Set initial adornee
-            if plr.Character then
-                UpdateAdornee(plr.Character)
-            end
+            -- Update Adornee when the player's character respawns
+            connections[plr] = plr.CharacterAdded:Connect(function(char)
+                UpdateAdornee(char)
+            end)
 
-            -- Continuously update distance, color, and distance label
-            local lastDistance = nil
-            connections[plr].distanceConnection = RunService.Heartbeat:Connect(function()
-                if espEnabled and lp.Character and plr.Character and lp.Character:FindFirstChild("HumanoidRootPart") and plr.Character:FindFirstChild("HumanoidRootPart") then
+            -- Constantly update the color based on distance
+            local distanceConnection
+            distanceConnection = game:GetService("RunService").Heartbeat:Connect(function()
+                if plr and plr.Character and lp and lp.Character then
                     local distance = (lp.Character.HumanoidRootPart.Position - plr.Character.HumanoidRootPart.Position).Magnitude
-                    if not lastDistance or math.abs(lastDistance - distance) > 2 then
-                        UpdateHighlightColor(highlight, distance)
-                        lastDistance = distance
-
-                        if billboard then
-                            billboard.TextLabel.Text = settings.customPlayerTag .. " | " .. math.floor(distance) .. " studs"
-                        end
-                    end
+                    UpdateHighlightColor(Highlight, distance)
                 end
             end)
+
+            -- Store connection so it can be cleaned up later
+            connections[plr] = {characterConnection = connections[plr], distanceConnection = distanceConnection}
         end
 
-        -- Clean up connections and highlights
-        local function CleanupPlayer(plr)
+        Players.PlayerAdded:Connect(Highlight)
+
+        for i, v in next, Players:GetPlayers() do
+            Highlight(v)
+        end
+
+        Players.PlayerRemoving:Connect(function(plr)
             if Storage:FindFirstChild(plr.Name) then
                 Storage[plr.Name]:Destroy()
             end
             if connections[plr] then
-                if connections[plr].distanceConnection then
-                    connections[plr].distanceConnection:Disconnect()
-                end
-                if connections[plr].CharacterAdded then
-                    connections[plr].CharacterAdded:Disconnect()
-                end
+                -- Disconnect both CharacterAdded and distance updates
+                connections[plr].characterConnection:Disconnect()
+                connections[plr].distanceConnection:Disconnect()
                 connections[plr] = nil
-            end
-        end
-
-        -- Apply highlight to all existing players
-        for _, v in ipairs(Players:GetPlayers()) do
-            SetupCharacterHighlight(v)
-        end
-
-        -- Setup highlights for new players
-        Players.PlayerAdded:Connect(SetupCharacterHighlight)
-
-        -- Clean up highlights for players who leave
-        Players.PlayerRemoving:Connect(CleanupPlayer)
-
-        -- Auto cleanup when script is disabled
-        game:GetService("StarterGui").Reset.OnClientEvent:Connect(function()
-            for _, plr in ipairs(Players:GetPlayers()) do
-                CleanupPlayer(plr)
             end
         end)
     end
