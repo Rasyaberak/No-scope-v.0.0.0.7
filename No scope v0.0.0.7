@@ -28,18 +28,18 @@ MakeWindow({
   }
 })
 
--- Initialize the tab and label for updates
-local Main = MakeTab({Name = "Loading Status"})
-local Label = AddTextLabel(Main, "Initializing...")
+-- Initialize the loading tab and label
+local CheckLoading = MakeTab({Name = "Loading Status"})
+local LabelLoading = AddTextLabel(CheckLoading, "Initializing...")
 
 -- Function to update the label and delay between stages
 local function UpdateLabel(text, duration)
-    SetLabel(Label, text)
+    SetLabel(LabelLoading, text)
     wait(duration)
 end
 
 -- Initialize loading sequence
-UpdateLabel("Script Made by Projeto LKB", 1)
+UpdateLabel("Script Made by Projeto LKA x F Hub", 1)
 UpdateLabel("Verifying User... 🔎", 1)
 UpdateLabel("Verifying Player Info... 👤", 1)
 UpdateLabel("Initializing Script... ⏳", 1)
@@ -55,23 +55,29 @@ local function LoadComponent(componentName, totalSteps, stepSize, icon)
 end
 
 -- Simulate loading components
-LoadComponent("Workspace Script", 12783, 1280, "🌍")
-LoadComponent("ReplicatedStorage Script", 3853, 400, "🛠")
-LoadComponent("ServerStorage Game", 1934, 200, "🔩")
+LoadComponent("Workspace Script", 12783, 980, "🌍")
+LoadComponent("ReplicatedStorage Script", 3853, 240, "🛠")
+LoadComponent("ServerStorage Game", 1934, 160, "🔩")
 
 -- Finalizing the load
 UpdateLabel("Finalizing Script Setup... ✔", 1)
 UpdateLabel("Script Loaded Successfully! 🎉", 1)
 l:Notify("Script Completed 🎉", "All components successfully loaded!", 5)
 
--- Final completion
-print("Script loading process completed successfully.")
+-- Wait 3 seconds, then remove the loading tab and label
+wait(3)
+DeleteTab(CheckLoading)
 
-local Paragraph = AddParagraph(Main, {"Made By Projeto LKA x F Hub", "Current In Beta Script"})
+-- Add the "Logs" tab after 1 second delay
+wait(1)
+local LogsTab = MakeTab({Name = "Logs"})
 
-local Paragraph = AddParagraph(Main, {"[ FEATURES ] Hitbox, Aim, Inf Junp(Fixing), Esp, Spin Player"})
+-- Add paragraphs to the "Logs" tab
+local Paragraph1 = AddParagraph(LogsTab, {"Made By Projeto LKA x F Hub", "Current In Beta Script"})
+local Paragraph2 = AddParagraph(LogsTab, {"[ FEATURES ] Hitbox, Aim, Inf Jump (Fixing), ESP, Spin Player"})
+local Paragraph3 = AddParagraph(LogsTab, {"19/09/2024", "Version 0.0.7"})
 
-local Paragraph = AddParagraph(Main, {"19/09/2024", "Version 0.0.7"})
+-- Small delay after adding the paragraphs
 wait(0.1)
 
 local Main = MakeTab({Name = "Aim (Head)"})
