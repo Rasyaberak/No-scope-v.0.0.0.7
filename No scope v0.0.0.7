@@ -95,15 +95,13 @@ function AutoShoot()
     end)
 end
 
-local Main = MakeTab({Name = "Aim (Body)"})
-
 -- Helper function to configure the aimbot
 local function configureAimbot(fov, distance, fovColor)
   _G.config = {
     Fov = fov,
     MaxTransparency = 0.1,
-    Smoothness = 1,
-    TargetPart = "Torso",  -- Target the body instead of the head
+    Smoothness = 0.5,
+    TargetPart = "head",  -- Target the body instead of the head
     TeamCheck = false,
     WallCheck = true,
     MaxDistanceEnabled = false,
@@ -152,6 +150,79 @@ AddButton(Main, {
 })
 wait(1)
 
+local Main = MakeTab({Name = "Aim (Torso)"})
+wait(0.1)
+AddButton(Main, {
+  Name = "Status: Patched",
+  Callback = function()
+print("Aim (Torso) - Patched")
+ end
+})
+--[[local Paragraph = AddParagraph(Main, {"Script Only WallCheck No Team Check !", "Aim (Head, Torso) Small, Medium, Big - Esp Player Speed, Inf Jump"})
+wait(1)
+AddButton(Main, {
+  Name = "Aim Small",
+  Callback = function()
+_G.config = {
+Fov = 60,
+MaxTransparency = 0.1,
+Smoothness = 1,
+TargetPart = "Torso",
+TeamCheck = false,
+WallCheck = true,
+MaxDistanceEnabled = false,
+MaxDistance = 1500,
+FovColor = Color3.fromRGB(102, 45, 145.)
+}
+
+loadstring(game:HttpGet("https://raw.githubusercontent.com/dqtixz/aimbot/main/Projeto%20LKA%20x%20F%20Hub", true))()
+ wait(0.1)
+l:Notify("Script Load !","Aim",3)
+ end
+})
+wait(0.1)
+AddButton(Main, {
+  Name = "Aim Medium",
+  Callback = function()
+_G.config = {
+Fov = 90,
+MaxTransparency = 0.1,
+Smoothness = 1,
+TargetPart = "Torso",
+TeamCheck = false,
+WallCheck = true,
+MaxDistanceEnabled = false,
+MaxDistance = 1500,
+FovColor = Color3.fromRGB(102, 45, 145.)
+}
+
+loadstring(game:HttpGet("https://raw.githubusercontent.com/dqtixz/aimbot/main/Projeto%20LKA%20x%20F%20Hub", true))()
+ wait(0.1)
+l:Notify("Script Load !","Aim",3)
+ end
+})
+wait(0.1)
+AddButton(Main, {
+  Name = "Aim Big",
+  Callback = function()
+_G.config = {
+Fov = 150,
+MaxTransparency = 0.1,
+Smoothness = 1,
+TargetPart = "Torso",
+TeamCheck = false,
+WallCheck = true,
+MaxDistanceEnabled = false,
+MaxDistance = 1500,
+FovColor = Color3.fromRGB(102, 45, 145.)
+}
+
+loadstring(game:HttpGet("https://raw.githubusercontent.com/dqtixz/aimbot/main/Projeto%20LKA%20x%20F%20Hub", true))()
+wait(0.1)
+l:Notify("Script Load !","Aim",3)
+ end
+})
+wait(0.1)]]
 local Main = MakeTab({Name = "Hitbox"})
 wait(0.1)
 AddTextBox(Main, {
