@@ -94,9 +94,9 @@ local function LoadComponent(componentName, totalSteps, stepSize, icon)
     for i = 0, totalSteps, stepSize do
         UpdateLabel("Loading " .. componentName .. "... ("..i.."/"..totalSteps..") " .. icon, 0.1)
     end
-    UpdateLabel("Loading Check " .. componentName .. "... ("..totalSteps.."/"..totalSteps..") " .. icon, 2)
-    l:Notify(componentName .. " " .. icon, "Successfully Loaded!", 0.1)
+    UpdateLabel("Loading Check " .. componentName .. "... ("..totalSteps.."/"..totalSteps..") " .. icon, 4)
     UpdateLabel(componentName .. " Load Finished " .. icon, 0.1)
+    l:Notify(componentName .. " " .. icon, "Successfully Loaded!", 3)
 end
 
 -- Simulate loading components
@@ -132,7 +132,7 @@ _G.config = {
 Fov = 30,
 MaxTransparency = 0.1,
 Smoothness = 1,
-TargetPart = "Head",
+TargetPart = "Torso",
 TeamCheck = false,
 WallCheck = true,
 MaxDistanceEnabled = false,
@@ -685,7 +685,7 @@ end
 })
 
 AddButton(Main, {
-    Name = "ESP Highlight",
+    Name = "Esp Highlight",
     Callback = function()
         local CoreGui = game:GetService("CoreGui")
         local Players = game:GetService("Players")
@@ -714,47 +714,50 @@ AddButton(Main, {
             end
         end
 
-        -- Function to create a highlight for each player
+        -- Function to create or retrieve a highlight for each player
         local function HighlightPlayer(plr)
             if plr == lp then return end -- Skip local player
 
-            local Highlight = Instance.new("Highlight")
-            Highlight.Name = plr.Name
-            Highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-            Highlight.FillTransparency = 0.5
-            Highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
-            Highlight.OutlineTransparency = 0
-            Highlight.Parent = Storage
+            -- Check if the highlight already exists
+            local Highlight = Storage:FindFirstChild(plr.Name)
+            if not Highlight then
+                Highlight = Instance.new("Highlight")
+                Highlight.Name = plr.Name
+                Highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                Highlight.FillTransparency = 0.5
+                Highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+                Highlight.OutlineTransparency = 0
+                Highlight.Parent = Storage
+            end
 
             -- Update highlight adornee to player character
             local function UpdateAdornee(char)
                 if char and char:FindFirstChild("HumanoidRootPart") then
                     Highlight.Adornee = char
-                else
-                    Highlight.Adornee = nil
                 end
             end
 
             UpdateAdornee(plr.Character) -- Set initial adornee
 
             -- Connect to the CharacterAdded event for when the player respawns
-            connections[plr] = plr.CharacterAdded:Connect(function(char)
+            if not connections[plr] then
+                connections[plr] = {}
+            end
+
+            table.insert(connections[plr], plr.CharacterAdded:Connect(function(char)
                 UpdateAdornee(char)
-            end)
+            end))
 
             -- Constantly update color based on distance
             local distanceConnection = RunService.Heartbeat:Connect(function()
-                if plr.Character and lp.Character and 
-                   plr.Character:FindFirstChild("HumanoidRootPart") and 
-                   lp.Character:FindFirstChild("HumanoidRootPart") then
-
+                if plr.Character and lp.Character and plr.Character:FindFirstChild("HumanoidRootPart") and lp.Character:FindFirstChild("HumanoidRootPart") then
                     local distance = (lp.Character.HumanoidRootPart.Position - plr.Character.HumanoidRootPart.Position).Magnitude
                     UpdateHighlightColor(Highlight, distance)
                 end
             end)
 
-            -- Store connections
-            connections[plr] = {characterConnection = connections[plr], distanceConnection = distanceConnection}
+            -- Store the distance connection for cleanup
+            connections[plr].distanceConnection = distanceConnection
         end
 
         -- Function to clean up when a player leaves
@@ -763,8 +766,9 @@ AddButton(Main, {
                 Storage[plr.Name]:Destroy()
             end
             if connections[plr] then
-                connections[plr].characterConnection:Disconnect()
-                connections[plr].distanceConnection:Disconnect()
+                for _, conn in ipairs(connections[plr]) do
+                    conn:Disconnect()
+                end
                 connections[plr] = nil
             end
         end
