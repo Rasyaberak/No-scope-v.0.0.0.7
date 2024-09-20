@@ -94,7 +94,7 @@ local function LoadComponent(componentName, totalSteps, stepSize, icon)
     for i = 0, totalSteps, stepSize do
         UpdateLabel("Loading " .. componentName .. "... ("..i.."/"..totalSteps..") " .. icon, 0.1)
     end
-    UpdateLabel("Loading Check " .. componentName .. "... ("..totalSteps.."/"..totalSteps..") " .. icon, 4)
+    UpdateLabel("Loading Check " .. componentName .. "... ("..totalSteps.."/"..totalSteps..") " .. icon, 2)
     UpdateLabel(componentName .. " Load Finished " .. icon, 0.1)
     l:Notify(componentName .. " " .. icon, "Successfully Loaded!", 3)
 end
@@ -107,7 +107,7 @@ LoadComponent("ServerStorage Game", 16934, 360, "🔩")
 -- Finalizing the load
 UpdateLabel("Finalizing Script Setup... ✔", 1)
 UpdateLabel("Script Loaded Successfully! 🎉", 0.1)
-l:Notify("Script Completed 🎉", "All components successfully loaded!", 1)
+l:Notify("Script Completed 🎉", "All components successfully loaded!", 2)
 
 -- Add the "Logs" tab after 1 second delay
 wait(1)
@@ -687,102 +687,85 @@ end
 AddButton(Main, {
     Name = "Esp Highlight",
     Callback = function()
-        local CoreGui = game:GetService("CoreGui")
-        local Players = game:GetService("Players")
-        local RunService = game:GetService("RunService")
+        local FillColor = Color3.fromRGB(150, 255, 150) -- Even brighter green for close range
+        local DepthMode = "AlwaysOnTop"
+        local FillTransparency = 0.5
+        local OutlineColor = Color3.fromRGB(255, 255, 255)
+        local OutlineTransparency = 0
+
+        local CoreGui = game:FindService("CoreGui")
+        local Players = game:FindService("Players")
         local lp = Players.LocalPlayer
         local connections = {}
 
-        -- Clean any previous highlights
-        if CoreGui:FindFirstChild("Highlight_Storage") then
-            CoreGui.Highlight_Storage:Destroy()
-        end
-
-        -- Create a storage folder for highlights
         local Storage = Instance.new("Folder")
         Storage.Parent = CoreGui
         Storage.Name = "Highlight_Storage"
 
-        -- Function to update highlight color based on proximity
         local function UpdateHighlightColor(Highlight, distance)
             if distance < 20 then
-                Highlight.FillColor = Color3.fromRGB(65, 255, 0) -- Green for close range
+                Highlight.FillColor = Color3.fromRGB(150, 255, 150) -- Brighter green for close
             elseif distance < 50 then
-                Highlight.FillColor = Color3.fromRGB(255, 165, 0) -- Orange for medium range
+                Highlight.FillColor = Color3.fromRGB(255, 220, 0) -- Brighter orange for medium range
             else
-                Highlight.FillColor = Color3.fromRGB(255, 0, 0) -- Red for far away
+                Highlight.FillColor = Color3.fromRGB(255, 100, 100) -- Brighter red for far away
             end
         end
 
-        -- Function to create or retrieve a highlight for each player
-        local function HighlightPlayer(plr)
-            if plr == lp then return end -- Skip local player
+        local function Highlight(plr)
+            local Highlight = Instance.new("Highlight")
+            Highlight.Name = plr.Name
+            Highlight.FillColor = FillColor
+            Highlight.DepthMode = DepthMode
+            Highlight.FillTransparency = FillTransparency
+            Highlight.OutlineColor = OutlineColor
+            Highlight.OutlineTransparency = OutlineTransparency
+            Highlight.Parent = Storage
 
-            -- Check if the highlight already exists
-            local Highlight = Storage:FindFirstChild(plr.Name)
-            if not Highlight then
-                Highlight = Instance.new("Highlight")
-                Highlight.Name = plr.Name
-                Highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-                Highlight.FillTransparency = 0.5
-                Highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
-                Highlight.OutlineTransparency = 0
-                Highlight.Parent = Storage
-            end
-
-            -- Update highlight adornee to player character
             local function UpdateAdornee(char)
-                if char and char:FindFirstChild("HumanoidRootPart") then
+                if char then
                     Highlight.Adornee = char
                 end
             end
 
-            UpdateAdornee(plr.Character) -- Set initial adornee
+            -- Set the initial Adornee to the player's character
+            UpdateAdornee(plr.Character)
 
-            -- Connect to the CharacterAdded event for when the player respawns
-            if not connections[plr] then
-                connections[plr] = {}
-            end
-
-            table.insert(connections[plr], plr.CharacterAdded:Connect(function(char)
+            -- Update Adornee when the player's character respawns
+            connections[plr] = plr.CharacterAdded:Connect(function(char)
                 UpdateAdornee(char)
-            end))
+            end)
 
-            -- Constantly update color based on distance
-            local distanceConnection = RunService.Heartbeat:Connect(function()
-                if plr.Character and lp.Character and plr.Character:FindFirstChild("HumanoidRootPart") and lp.Character:FindFirstChild("HumanoidRootPart") then
+            -- Constantly update the color based on distance
+            local distanceConnection
+            distanceConnection = game:GetService("RunService").Heartbeat:Connect(function()
+                if plr and plr.Character and lp and lp.Character then
                     local distance = (lp.Character.HumanoidRootPart.Position - plr.Character.HumanoidRootPart.Position).Magnitude
                     UpdateHighlightColor(Highlight, distance)
                 end
             end)
 
-            -- Store the distance connection for cleanup
-            connections[plr].distanceConnection = distanceConnection
+            -- Store connection so it can be cleaned up later
+            connections[plr] = {characterConnection = connections[plr], distanceConnection = distanceConnection}
         end
 
-        -- Function to clean up when a player leaves
-        local function CleanupHighlight(plr)
+        Players.PlayerAdded:Connect(Highlight)
+
+        for i, v in next, Players:GetPlayers() do
+            Highlight(v)
+        end
+
+        Players.PlayerRemoving:Connect(function(plr)
             if Storage:FindFirstChild(plr.Name) then
                 Storage[plr.Name]:Destroy()
             end
             if connections[plr] then
-                for _, conn in ipairs(connections[plr]) do
-                    conn:Disconnect()
-                end
+                -- Disconnect both CharacterAdded and distance updates
+                connections[plr].characterConnection:Disconnect()
+                connections[plr].distanceConnection:Disconnect()
                 connections[plr] = nil
             end
-        end
-
-        -- Handle existing players
-        for _, v in ipairs(Players:GetPlayers()) do
-            HighlightPlayer(v)
-        end
-
-        -- Handle new players joining
-        Players.PlayerAdded:Connect(HighlightPlayer)
-
-        -- Handle players leaving
-        Players.PlayerRemoving:Connect(CleanupHighlight)
+        end)
     end
 })
 
