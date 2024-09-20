@@ -103,7 +103,7 @@ AddButton(Main, {
   Name = "Aim Small",
   Callback = function()
 _G.config = {
-Fov = 80,
+Fov = 30,
 MaxTransparency = 0.1,
 Smoothness = 1,
 TargetPart = "Head",
@@ -111,25 +111,22 @@ TeamCheck = false,
 WallCheck = true,
 MaxDistanceEnabled = false,
 MaxDistance = 1500,
-FovColor = Color3.fromRGB(102, 45, 145)
+FovColor = Color3.fromRGB(102, 45, 145.)
 }
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/dqtixz/aimbot/main/Projeto%20LKA%20x%20F%20Hub", true))()
 wait(0.1)
-l:Notify("Script Load !","Aim Small",3)
-
--- Enable AutoShoot
+l:Notify("Script Load !","Aim",3)
 AutoShoot()
  end
 })
-
 wait(1)
 
 AddButton(Main, {
   Name = "Aim Medium",
   Callback = function()
 _G.config = {
-Fov = 120,
+Fov = 40,
 MaxTransparency = 0.1,
 Smoothness = 1,
 TargetPart = "Head",
@@ -137,25 +134,22 @@ TeamCheck = false,
 WallCheck = true,
 MaxDistanceEnabled = false,
 MaxDistance = 1500,
-FovColor = Color3.fromRGB(102, 45, 145)
+FovColor = Color3.fromRGB(102, 45, 145.)
 }
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/dqtixz/aimbot/main/Projeto%20LKA%20x%20F%20Hub", true))()
 wait(0.1)
-l:Notify("Script Load !","Aim Medium",3)
-
--- Enable AutoShoot
+l:Notify("Script Load !","Aim",3)
 AutoShoot()
  end
 })
-
 wait(1)
 
 AddButton(Main, {
   Name = "Aim Big",
   Callback = function()
 _G.config = {
-Fov = 150,
+Fov = 50,
 MaxTransparency = 0.1,
 Smoothness = 1,
 TargetPart = "Head",
@@ -163,18 +157,17 @@ TeamCheck = false,
 WallCheck = true,
 MaxDistanceEnabled = false,
 MaxDistance = 1500,
-FovColor = Color3.fromRGB(102, 45, 145)
+FovColor = Color3.fromRGB(102, 45, 145.)
 }
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/dqtixz/aimbot/main/Projeto%20LKA%20x%20F%20Hub", true))()
 wait(0.1)
-l:Notify("Script Load !","Aim Big",3)
-
--- Enable AutoShoot
+l:Notify("Script Load !","Aim",3)
 AutoShoot()
  end
 })
 wait(0.1)
+
 local Main = MakeTab({Name = "Aim (Torso)"})
 wait(0.1)
 AddButton(Main, {
