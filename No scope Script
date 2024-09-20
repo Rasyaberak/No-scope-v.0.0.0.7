@@ -32,37 +32,82 @@ MakeWindow({
 local CheckLoading = MakeTab({Name = "Loading Status"})
 local LabelLoading = AddTextLabel(CheckLoading, "Initializing...")
 
--- Function to update the label and delay between stages
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+-- Function to update the label with a loading sequence
 local function UpdateLabel(text, duration)
-    SetLabel(LabelLoading, text)
+    LabelLoading.Text = text  -- Ensure LabelLoading is a valid GUI TextLabel
     wait(duration)
 end
 
--- Initialize loading sequence
-UpdateLabel("Script Made by Projeto LKA x F Hub", 1)
-UpdateLabel("Verifying User... 🔎", 1)
-UpdateLabel("Verifying Player Info... 👤", 1)
-UpdateLabel("Initializing Script... ⏳", 1)
+-- Function to verify user and player information
+local function VerifyUser()
+    if LocalPlayer and LocalPlayer.UserId then
+        -- Check if the player name is valid
+        if LocalPlayer.Name and LocalPlayer.Name ~= "" then
+            return true
+        end
+    end
+    return false
+end
+
+-- Function to display a loading progress with additional messages
+local function LoadingSequence()
+    local messages = {
+        "Script Made by Projeto LKA x F Hub",
+        "Verifying User... 🔎",
+        "Verifying Player Info... 👤",
+        "Initializing Script... ⏳"
+    }
+
+    for i, message in ipairs(messages) do
+        UpdateLabel(message, 1)
+
+        -- Optional: Add a progress indicator
+        if i < #messages then
+            UpdateLabel(message .. " | Progress: " .. i .. "/" .. #messages, 0.5)
+        end
+    end
+
+    -- Verify user and player info
+    if VerifyUser() then
+        UpdateLabel("User Verified Successfully!", 1)
+        
+        -- Additional checks or actions can be added here
+        UpdateLabel("Welcome, " .. LocalPlayer.Name .. "!", 1)
+    else
+        UpdateLabel("User Verification Failed!", 2)
+        return
+    end
+
+    -- Final initialization step
+    UpdateLabel("All systems go! 🚀", 1)
+end
+
+-- Start the loading sequence
+LoadingSequence()
+wait(1)
 
 -- Function to simulate loading with steps and notify when complete
 local function LoadComponent(componentName, totalSteps, stepSize, icon)
     for i = 0, totalSteps, stepSize do
         UpdateLabel("Loading " .. componentName .. "... ("..i.."/"..totalSteps..") " .. icon, 0.1)
     end
-    UpdateLabel("Loading " .. componentName .. "... ("..totalSteps.."/"..totalSteps..") " .. icon, 0.3)
-    l:Notify(componentName .. " " .. icon, "Successfully Loaded!", 3)
-    UpdateLabel(componentName .. " Load Finished " .. icon, 1)
+    UpdateLabel("Loading Check " .. componentName .. "... ("..totalSteps.."/"..totalSteps..") " .. icon, 2)
+    l:Notify(componentName .. " " .. icon, "Successfully Loaded!", 0.1)
+    UpdateLabel(componentName .. " Load Finished " .. icon, 0.1)
 end
 
 -- Simulate loading components
 LoadComponent("Workspace Script", 11783, 980, "🌍")
-LoadComponent("ReplicatedStorage Script", 3853, 240, "🛠")
-LoadComponent("ServerStorage Game", 16934, 160, "🔩")
+LoadComponent("ReplicatedStorage Script", 7853, 440, "🛠")
+LoadComponent("ServerStorage Game", 16934, 360, "🔩")
 
 -- Finalizing the load
 UpdateLabel("Finalizing Script Setup... ✔", 1)
-UpdateLabel("Script Loaded Successfully! 🎉", 1)
-l:Notify("Script Completed 🎉", "All components successfully loaded!", 5)
+UpdateLabel("Script Loaded Successfully! 🎉", 0.1)
+l:Notify("Script Completed 🎉", "All components successfully loaded!", 1)
 
 -- Add the "Logs" tab after 1 second delay
 wait(1)
@@ -648,17 +693,17 @@ AddButton(Main, {
         local lp = Players.LocalPlayer
         local connections = {}
 
-        -- Clean up any old highlights
+        -- Clean any previous highlights
         if CoreGui:FindFirstChild("Highlight_Storage") then
             CoreGui.Highlight_Storage:Destroy()
         end
 
-        -- Create a folder for highlights in CoreGui
+        -- Create a storage folder for highlights
         local Storage = Instance.new("Folder")
         Storage.Parent = CoreGui
         Storage.Name = "Highlight_Storage"
 
-        -- Function to update highlight color based on distance
+        -- Function to update highlight color based on proximity
         local function UpdateHighlightColor(Highlight, distance)
             if distance < 20 then
                 Highlight.FillColor = Color3.fromRGB(65, 255, 0) -- Green for close range
@@ -670,48 +715,50 @@ AddButton(Main, {
         end
 
         -- Function to create a highlight for each player
-        local function CreateHighlight(plr)
-            -- Skip local player (no self-highlighting)
-            if plr == lp then return end 
+        local function HighlightPlayer(plr)
+            if plr == lp then return end -- Skip local player
 
-            -- Create the Highlight instance
             local Highlight = Instance.new("Highlight")
             Highlight.Name = plr.Name
-            Highlight.FillTransparency = 0.5
-            Highlight.OutlineTransparency = 0
-            Highlight.OutlineColor = Color3.fromRGB(255, 255, 255) -- White outline
             Highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+            Highlight.FillTransparency = 0.5
+            Highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+            Highlight.OutlineTransparency = 0
             Highlight.Parent = Storage
 
-            -- Function to update highlight adornee to player character
+            -- Update highlight adornee to player character
             local function UpdateAdornee(char)
                 if char and char:FindFirstChild("HumanoidRootPart") then
                     Highlight.Adornee = char
+                else
+                    Highlight.Adornee = nil
                 end
             end
 
-            -- Set the initial adornee to the player's character
-            UpdateAdornee(plr.Character)
+            UpdateAdornee(plr.Character) -- Set initial adornee
 
-            -- Connect to the CharacterAdded event to handle player respawns
+            -- Connect to the CharacterAdded event for when the player respawns
             connections[plr] = plr.CharacterAdded:Connect(function(char)
                 UpdateAdornee(char)
             end)
 
             -- Constantly update color based on distance
             local distanceConnection = RunService.Heartbeat:Connect(function()
-                if plr.Character and lp.Character and plr.Character:FindFirstChild("HumanoidRootPart") and lp.Character:FindFirstChild("HumanoidRootPart") then
+                if plr.Character and lp.Character and 
+                   plr.Character:FindFirstChild("HumanoidRootPart") and 
+                   lp.Character:FindFirstChild("HumanoidRootPart") then
+
                     local distance = (lp.Character.HumanoidRootPart.Position - plr.Character.HumanoidRootPart.Position).Magnitude
                     UpdateHighlightColor(Highlight, distance)
                 end
             end)
 
-            -- Store connections for cleanup later
+            -- Store connections
             connections[plr] = {characterConnection = connections[plr], distanceConnection = distanceConnection}
         end
 
-        -- Function to clean up highlight and connections when a player leaves
-        local function RemoveHighlight(plr)
+        -- Function to clean up when a player leaves
+        local function CleanupHighlight(plr)
             if Storage:FindFirstChild(plr.Name) then
                 Storage[plr.Name]:Destroy()
             end
@@ -722,16 +769,16 @@ AddButton(Main, {
             end
         end
 
-        -- Highlight all existing players
-        for _, plr in ipairs(Players:GetPlayers()) do
-            CreateHighlight(plr)
+        -- Handle existing players
+        for _, v in ipairs(Players:GetPlayers()) do
+            HighlightPlayer(v)
         end
 
-        -- Connect to PlayerAdded to handle new players
-        Players.PlayerAdded:Connect(CreateHighlight)
+        -- Handle new players joining
+        Players.PlayerAdded:Connect(HighlightPlayer)
 
-        -- Connect to PlayerRemoving to clean up when players leave
-        Players.PlayerRemoving:Connect(RemoveHighlight)
+        -- Handle players leaving
+        Players.PlayerRemoving:Connect(CleanupHighlight)
     end
 })
 
