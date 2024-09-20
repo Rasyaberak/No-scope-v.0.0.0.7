@@ -55,9 +55,9 @@ local function LoadComponent(componentName, totalSteps, stepSize, icon)
 end
 
 -- Simulate loading components
-LoadComponent("Workspace Script", 12783, 980, "🌍")
+LoadComponent("Workspace Script", 11783, 980, "🌍")
 LoadComponent("ReplicatedStorage Script", 3853, 240, "🛠")
-LoadComponent("ServerStorage Game", 1934, 160, "🔩")
+LoadComponent("ServerStorage Game", 24934, 160, "🔩")
 
 -- Finalizing the load
 UpdateLabel("Finalizing Script Setup... ✔", 1)
@@ -175,7 +175,6 @@ AutoShoot()
  end
 })
 wait(0.1)
-
 local Main = MakeTab({Name = "Aim (Torso)"})
 wait(0.1)
 AddButton(Main, {
@@ -190,7 +189,7 @@ AddButton(Main, {
   Name = "Aim Small",
   Callback = function()
 _G.config = {
-Fov = 60,
+Fov = 30,
 MaxTransparency = 0.1,
 Smoothness = 1,
 TargetPart = "Torso",
@@ -211,7 +210,7 @@ AddButton(Main, {
   Name = "Aim Medium",
   Callback = function()
 _G.config = {
-Fov = 90,
+Fov = 40,
 MaxTransparency = 0.1,
 Smoothness = 1,
 TargetPart = "Torso",
@@ -232,7 +231,7 @@ AddButton(Main, {
   Name = "Aim Big",
   Callback = function()
 _G.config = {
-Fov = 150,
+Fov = 50,
 MaxTransparency = 0.1,
 Smoothness = 1,
 TargetPart = "Torso",
@@ -668,93 +667,159 @@ game.Players.PlayerAdded:Connect(function(newplr)
     end
 end)
 wait(0.1)
+l:Notify("Visual Script Load","Esp (Line)",3)
 end
 })
 
 AddButton(Main, {
-    Name = "Esp Highlight",
+    Name = "ESP Highlight",
     Callback = function()
-        local FillColor = Color3.fromRGB(65, 255, 0) -- Default green for close range
-        local DepthMode = "AlwaysOnTop"
-        local FillTransparency = 0.5
-        local OutlineColor = Color3.fromRGB(255, 255, 255)
-        local OutlineTransparency = 0
-
-        local CoreGui = game:FindService("CoreGui")
-        local Players = game:FindService("Players")
+        local CoreGui = game:GetService("CoreGui")
+        local Players = game:GetService("Players")
+        local RunService = game:GetService("RunService")
         local lp = Players.LocalPlayer
         local connections = {}
 
+        -- Debounce interval for distance checks (adjusted for performance)
+        local debounceInterval = 0.1
+
+        -- Clean any previous highlights
+        if CoreGui:FindFirstChild("Highlight_Storage") then
+            CoreGui.Highlight_Storage:Destroy()
+        end
+
+        -- Storage for the highlights
         local Storage = Instance.new("Folder")
         Storage.Parent = CoreGui
         Storage.Name = "Highlight_Storage"
 
-        local function UpdateHighlightColor(Highlight, distance)
-            if distance < 20 then
-                Highlight.FillColor = Color3.fromRGB(65, 255, 0) -- Green for close
-            elseif distance < 50 then
-                Highlight.FillColor = Color3.fromRGB(255, 165, 0) -- Orange for medium range
+        -- Settings for proximity-based colors
+        local colorSettings = {
+            closeColor = Color3.fromRGB(65, 255, 0),   -- Green
+            mediumColor = Color3.fromRGB(255, 165, 0), -- Orange
+            farColor = Color3.fromRGB(255, 0, 0),      -- Red
+        }
+
+        -- Distance thresholds for color changes
+        local distanceSettings = {
+            close = 20,
+            medium = 50,
+            far = 100
+        }
+
+        -- Color Lerp function (for smooth transitions)
+        local function LerpColor(color1, color2, alpha)
+            return Color3.new(
+                color1.R + (color2.R - color1.R) * alpha,
+                color1.G + (color2.G - color1.G) * alpha,
+                color1.B + (color2.B - color1.B) * alpha
+            )
+        end
+
+        -- Update highlight color based on distance
+        local function UpdateHighlight(Highlight, distance)
+            if distance < distanceSettings.close then
+                Highlight.FillColor = colorSettings.closeColor
+            elseif distance < distanceSettings.medium then
+                local alpha = (distance - distanceSettings.close) / (distanceSettings.medium - distanceSettings.close)
+                Highlight.FillColor = LerpColor(colorSettings.closeColor, colorSettings.mediumColor, alpha)
+            elseif distance < distanceSettings.far then
+                local alpha = (distance - distanceSettings.medium) / (distanceSettings.far - distanceSettings.medium)
+                Highlight.FillColor = LerpColor(colorSettings.mediumColor, colorSettings.farColor, alpha)
             else
-                Highlight.FillColor = Color3.fromRGB(255, 0, 0) -- Red for far away
+                Highlight.FillColor = colorSettings.farColor
             end
         end
 
-        local function Highlight(plr)
+        -- Billboard for distance and name display
+        local function CreateBillboard(plr)
+            local Billboard = Instance.new("BillboardGui")
+            Billboard.Name = plr.Name .. "_Info"
+            Billboard.AlwaysOnTop = true
+            Billboard.Size = UDim2.new(0, 100, 0, 50)
+            Billboard.StudsOffset = Vector3.new(0, 3, 0)
+
+            local TextLabel = Instance.new("TextLabel")
+            TextLabel.Size = UDim2.new(1, 0, 1, 0)
+            TextLabel.BackgroundTransparency = 1
+            TextLabel.TextScaled = true
+            TextLabel.TextColor3 = Color3.new(1, 1, 1) -- White
+            TextLabel.Parent = Billboard
+
+            return Billboard, TextLabel
+        end
+
+        -- Create the highlight for each player
+        local function HighlightPlayer(plr)
+            -- Skip local player
+            if plr == lp then return end
+
+            -- Create the highlight instance
             local Highlight = Instance.new("Highlight")
             Highlight.Name = plr.Name
-            Highlight.FillColor = FillColor
-            Highlight.DepthMode = DepthMode
-            Highlight.FillTransparency = FillTransparency
-            Highlight.OutlineColor = OutlineColor
-            Highlight.OutlineTransparency = OutlineTransparency
+            Highlight.FillTransparency = 0.5
+            Highlight.OutlineColor = Color3.new(1, 1, 1) -- White
+            Highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
             Highlight.Parent = Storage
 
+            -- Create the distance and name display above the player
+            local Billboard, TextLabel = CreateBillboard(plr)
+            Billboard.Parent = CoreGui
+
+            -- Update the highlight's adornee
             local function UpdateAdornee(char)
-                if char then
+                if char and char:FindFirstChild("HumanoidRootPart") then
                     Highlight.Adornee = char
+                    Billboard.Adornee = char.HumanoidRootPart
                 end
             end
 
-            -- Set the initial Adornee to the player's character
+            -- Set initial adornee and connections for player respawn
             UpdateAdornee(plr.Character)
 
-            -- Update Adornee when the player's character respawns
             connections[plr] = plr.CharacterAdded:Connect(function(char)
                 UpdateAdornee(char)
             end)
 
-            -- Constantly update the color based on distance
-            local distanceConnection
-            distanceConnection = game:GetService("RunService").Heartbeat:Connect(function()
-                if plr and plr.Character and lp and lp.Character then
-                    local distance = (lp.Character.HumanoidRootPart.Position - plr.Character.HumanoidRootPart.Position).Magnitude
-                    UpdateHighlightColor(Highlight, distance)
+            -- Update the highlight color and distance display with debounce
+            connections[plr].heartbeat = RunService.Heartbeat:Connect(function()
+                if plr.Character and lp.Character then
+                    local plrPos = plr.Character:FindFirstChild("HumanoidRootPart")
+                    local lpPos = lp.Character:FindFirstChild("HumanoidRootPart")
+                    if plrPos and lpPos then
+                        local distance = (lpPos.Position - plrPos.Position).Magnitude
+                        UpdateHighlight(Highlight, distance)
+                        TextLabel.Text = string.format("%s\n%.1f studs", plr.Name, distance)
+                    end
                 end
             end)
-
-            -- Store connection so it can be cleaned up later
-            connections[plr] = {characterConnection = connections[plr], distanceConnection = distanceConnection}
         end
 
-        Players.PlayerAdded:Connect(Highlight)
-
-        for i, v in next, Players:GetPlayers() do
-            Highlight(v)
-        end
-
-        Players.PlayerRemoving:Connect(function(plr)
+        -- Clean up when players leave
+        local function RemovePlayer(plr)
             if Storage:FindFirstChild(plr.Name) then
                 Storage[plr.Name]:Destroy()
             end
+            if CoreGui:FindFirstChild(plr.Name .. "_Info") then
+                CoreGui[plr.Name .. "_Info"]:Destroy()
+            end
             if connections[plr] then
-                -- Disconnect both CharacterAdded and distance updates
-                connections[plr].characterConnection:Disconnect()
-                connections[plr].distanceConnection:Disconnect()
+                connections[plr]:Disconnect()
                 connections[plr] = nil
             end
-        end)
+        end
+
+        -- Highlight current players
+        for _, plr in ipairs(Players:GetPlayers()) do
+            HighlightPlayer(plr)
+        end
+
+        -- Listen for new players joining and leaving
+        Players.PlayerAdded:Connect(HighlightPlayer)
+        Players.PlayerRemoving:Connect(RemovePlayer)
     end
 })
+
 
 local Main = MakeTab({Name = "Extras"})
 wait(0.1)
