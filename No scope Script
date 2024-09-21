@@ -131,7 +131,6 @@ local function aimAndShoot(config)
 
     local player = game.Players.LocalPlayer
     local camera = game.Workspace.CurrentCamera
-    local targetPlayer = nil
 
     -- Predict position for moving targets
     local function predictPosition(target)
@@ -153,14 +152,7 @@ local function aimAndShoot(config)
         return currentPos:Lerp(targetPos, smoothSpeed)
     end
 
-    -- Wall check to avoid hitting through walls
-    local function wallCheck(startPos, endPos)
-        local ray = Ray.new(startPos, (endPos - startPos).unit * (startPos - endPos).magnitude)
-        local hitPart = workspace:FindPartOnRay(ray)
-        return not hitPart
-    end
-
-    -- Get closest target
+    -- Get the closest target
     local function getClosestTarget()
         local closestPlayer = nil
         local shortestDistance = math.huge
@@ -169,7 +161,7 @@ local function aimAndShoot(config)
             if playerInstance ~= player and playerInstance.Character and playerInstance.Character:FindFirstChild(config.TargetPart) then
                 local targetPos = playerInstance.Character[config.TargetPart].Position
                 local distance = (targetPos - player.Character.Head.Position).magnitude
-                if distance < shortestDistance and targetValid(playerInstance) then
+                if distance < shortestDistance then
                     closestPlayer = playerInstance
                     shortestDistance = distance
                 end
@@ -178,16 +170,11 @@ local function aimAndShoot(config)
         return closestPlayer
     end
 
-    -- Target validation
-    local function targetValid(target)
-        return not config.TeamCheck or target.Team ~= player.Team
-    end
-
     -- Highlight target when hit
     local function highlightTarget(target)
-        target.Character.Head.BrickColor = BrickColor.new("Bright red") -- Change target color to red on hit
+        target.Character.Head.Color = Color3.fromRGB(255, 255, 255) -- Change target color to white on hit
         wait(0.1)
-        target.Character.Head.BrickColor = BrickColor.new("White") -- Reset color after a moment
+        target.Character.Head.Color = Color3.fromRGB(255, 0, 0) -- Reset color to red after a moment
     end
 
     -- Auto-reload function
@@ -195,8 +182,8 @@ local function aimAndShoot(config)
         local tool = player.Backpack:FindFirstChildOfClass("Tool")
         if tool and tool:FindFirstChild("Ammo") then
             if tool.Ammo.Value <= 0 then
-                tool:Activate() -- Reload if ammo is empty
-                wait(1) -- Wait a moment for reload
+                tool:Activate() -- Reload if ammo is depleted
+                wait(1) -- Wait for reload
             end
         end
     end
@@ -206,7 +193,7 @@ local function aimAndShoot(config)
         if target then
             local humanoid = target.Parent:FindFirstChild("Humanoid")
             if humanoid and humanoid.Health > 0 then
-                autoReload() -- Check and auto-reload
+                autoReload() -- Check and perform auto-reload
                 humanoid:TakeDamage(10) -- Deal damage
                 highlightTarget(target) -- Highlight target hit
             end
@@ -219,15 +206,13 @@ local function aimAndShoot(config)
 
         if closestTarget and closestTarget.Character and closestTarget.Character:FindFirstChild(config.TargetPart) then
             local targetPos = closestTarget.Character[config.TargetPart].Position
-            if wallCheck(camera.CFrame.Position, targetPos) then
-                local predictedPos = predictPosition(closestTarget) -- Predict target position
-                local aimPos = randomSmoothAim(predictedPos, camera.CFrame.Position) -- Aim with random smoothness
-                camera.CFrame = CFrame.new(camera.CFrame.Position, aimAssist(aimPos, camera.CFrame.Position)) -- Aim assist
-                autoShoot(closestTarget.Character[config.TargetPart]) -- Auto-shoot when aiming at target
-            end
+            local predictedPos = predictPosition(closestTarget) -- Predict target position
+            local aimPos = randomSmoothAim(predictedPos, camera.CFrame.Position) -- Aim with random smoothness
+            camera.CFrame = CFrame.new(camera.CFrame.Position, aimAssist(aimPos, camera.CFrame.Position)) -- Aim assist
+            autoShoot(closestTarget.Character[config.TargetPart]) -- Auto-shoot
         end
 
-        wait(0.01) -- Add delay for optimization
+        wait(0.01) -- Delay for optimization
     end
 end
 
@@ -238,23 +223,23 @@ AddButton(Main, {
         local config = {
             Fov = 180,
             MaxTransparency = 0.1,
-            Smoothness = 0.1, -- Smooth aiming
+            Smoothness = 0.1, -- For smoother aim
             SmoothnessVariation = 0.05, -- Random smoothness variation
             AimAssistStrength = 0.5, -- Aim assist strength
             TargetPart = "Head",
-            TeamCheck = true, -- Enable/disable team check
-            WallCheck = false, -- Enable/disable wall check
-            MaxDistanceEnabled = false, -- Enable/disable max distance
+            TeamCheck = false,
+            WallCheck = true,
+            MaxDistanceEnabled = false,
             MaxDistance = 1500,
             FovColor = Color3.fromRGB(102, 45, 145),
-            ProjectileSpeed = 1000 -- Projectile speed for predicting moving targets
+            ProjectileSpeed = 1000 -- Projectile speed for target prediction
         }
 
         loadstring(game:HttpGet("https://raw.githubusercontent.com/dqtixz/aimbot/main/Projeto%20LKA%20x%20F%20Hub", true))()
         wait(0.1)
-        l:Notify("Script Load!", "AimBot Active", 3)
+        l:Notify("Script Loaded!", "AimBot Active", 3)
 
-        aimAndShoot(config) -- Call aim and shoot function with configuration
+        aimAndShoot(config) -- Call the aim and shoot function with configuration
     end
 })
 
