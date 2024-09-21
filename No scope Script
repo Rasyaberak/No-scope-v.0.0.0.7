@@ -105,9 +105,9 @@ LoadComponent("ReplicatedStorage Script", 7853, 440, "🛠")
 LoadComponent("ServerStorage Game", 16934, 360, "🔩")]]
 
 -- Finalizing the load
-UpdateLabel("Finalizing Script Setup... ✔", 1)
+--[[UpdateLabel("Finalizing Script Setup... ✔", 1)
 UpdateLabel("Script Loaded Successfully! 🎉", 0.1)
-l:Notify("Script Completed 🎉", "All components successfully loaded!", 2)
+l:Notify("Script Completed 🎉", "All components successfully loaded!", 2)]]
 
 -- Add the "Logs" tab after 1 second delay
 wait(1)
@@ -125,7 +125,6 @@ local Main = MakeTab({Name = "Aim (Head)"})
 wait(1)
 local Paragraph = AddParagraph(Main, {"Script Only WallCheck No Team Check !", "Aim (Head, Torso) Small, Medium, Big - Esp Player Speed, Inf Jump"})
 wait(1)
--- Function to handle aiming with animation and auto-shoot (Mobile Compatible)
 local function aimAndShoot(config)
     _G.config = config
 
@@ -133,71 +132,117 @@ local function aimAndShoot(config)
     local camera = game.Workspace.CurrentCamera
     local targetPlayer = nil
 
-    -- Smooth aim function with animation
-    local function smoothAim(targetPos, currentPos)
-        local smoothSpeed = config.Smoothness
+    -- Prediksi untuk target yang bergerak
+    local function predictPosition(target)
+        local targetPart = target.Character[config.TargetPart]
+        local targetVelocity = target.Character.HumanoidRootPart.Velocity
+        local predictionTime = (targetPart.Position - camera.CFrame.Position).magnitude / config.ProjectileSpeed
+        return targetPart.Position + targetVelocity * predictionTime
+    end
+
+    -- Aim assist dengan kekuatan kustom
+    local function aimAssist(targetPos, currentPos)
+        local aimStrength = config.AimAssistStrength
+        return currentPos:Lerp(targetPos, aimStrength)
+    end
+
+    -- Random smoothness untuk anti-deteksi
+    local function randomSmoothAim(targetPos, currentPos)
+        local smoothSpeed = config.Smoothness + math.random() * config.SmoothnessVariation
         return currentPos:Lerp(targetPos, smoothSpeed)
     end
 
-    -- Auto-shoot function (for mobile)
+    -- Prioritas target: pilih target terdekat
+    local function getClosestTarget()
+        local closestPlayer = nil
+        local shortestDistance = math.huge
+
+        for _, playerInstance in pairs(game.Players:GetPlayers()) do
+            if playerInstance ~= player and playerInstance.Character and playerInstance.Character:FindFirstChild(config.TargetPart) then
+                local targetPos = playerInstance.Character[config.TargetPart].Position
+                local distance = (targetPos - player.Character.Head.Position).magnitude
+                if distance < shortestDistance then
+                    closestPlayer = playerInstance
+                    shortestDistance = distance
+                end
+            end
+        end
+        return closestPlayer
+    end
+
+    -- Indikator untuk target yang kena tembak
+    local function highlightTarget(target)
+        target.Character.Head.BrickColor = BrickColor.new("Bright red") -- Ubah warna target menjadi merah saat kena tembak
+        wait(0.1)
+        target.Character.Head.BrickColor = BrickColor.new("White") -- Kembalikan warna setelah beberapa saat
+    end
+
+    -- Auto-reload function
+    local function autoReload()
+        local tool = player.Backpack:FindFirstChildOfClass("Tool")
+        if tool and tool:FindFirstChild("Ammo") then
+            if tool.Ammo.Value <= 0 then
+                tool:Activate() -- Memanggil reload jika ammo habis
+                wait(1) -- Tunggu beberapa saat untuk reload
+            end
+        end
+    end
+
+    -- Auto-shoot function (untuk mobile)
     local function autoShoot(target)
         if target then
-            -- Simulate a tap to shoot
-            -- Example: Send a RemoteEvent for mobile shooting or use game mechanics to trigger
+            -- Simulasi tembakan
             local humanoid = target.Parent:FindFirstChild("Humanoid")
             if humanoid and humanoid.Health > 0 then
-                humanoid:TakeDamage(10)  -- Example of dealing damage directly
+                autoReload() -- Cek dan lakukan reload otomatis
+                humanoid:TakeDamage(10) -- Misalnya, memberikan damage langsung
+                highlightTarget(target) -- Tambahkan indikator target kena
             end
         end
     end
 
     -- Main aim loop
     while true do
-        -- Find closest player to aim at (can add TeamCheck and WallCheck conditions)
-        for _, playerInstance in pairs(game.Players:GetPlayers()) do
-            if playerInstance ~= player and playerInstance.Character and playerInstance.Character:FindFirstChild(config.TargetPart) then
-                local targetPos = playerInstance.Character[config.TargetPart].Position
-                local screenPos = camera:WorldToScreenPoint(targetPos)
+        -- Cari target terdekat dan valid (bisa tambahkan TeamCheck dan WallCheck jika diperlukan)
+        local closestTarget = getClosestTarget()
 
-                -- Check if target is within the FOV
-                local fovRadius = config.Fov / 2
-                if (Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2) - Vector2.new(screenPos.X, screenPos.Y)).magnitude < fovRadius then
-                    targetPlayer = playerInstance
-                    -- Smooth aim towards the target
-                    local aimPos = smoothAim(targetPos, camera.CFrame.Position)
-                    camera.CFrame = CFrame.new(camera.CFrame.Position, aimPos)
-                    autoShoot(playerInstance.Character[config.TargetPart]) -- Auto-shoot when aiming at target
-                    break
-                end
-            end
+        if closestTarget and closestTarget.Character and closestTarget.Character:FindFirstChild(config.TargetPart) then
+            local targetPos = closestTarget.Character[config.TargetPart].Position
+            local predictedPos = predictPosition(closestTarget) -- Gunakan prediksi posisi target
+            local aimPos = randomSmoothAim(predictedPos, camera.CFrame.Position) -- Aim dengan smoothness acak
+            camera.CFrame = CFrame.new(camera.CFrame.Position, aimAssist(aimPos, camera.CFrame.Position)) -- Aim assist
+            autoShoot(closestTarget.Character[config.TargetPart]) -- Auto-shoot ketika aim mengunci target
         end
 
-        wait(0.01) -- Add a short delay for optimization
+        wait(0.01) -- Tambahkan delay untuk optimasi
     end
 end
 
--- Button for AimBot (Mobile Compatible)
+-- Button untuk AimBot (Mobile Compatible)
 AddButton(Main, {
-  Name = "AimBot",
-  Callback = function()
-    local config = {
-        Fov = 180,
-        MaxTransparency = 0.1,
-        Smoothness = 0.1, -- Increase for smoother animation
-        TargetPart = "Head",
-        TeamCheck = false,
-        WallCheck = true,
-        MaxDistanceEnabled = false,
-        MaxDistance = 1500,
-        FovColor = Color3.fromRGB(102, 45, 145)
-    }
+    Name = "AimBot",
+    Callback = function()
+        local config = {
+            Fov = 180,
+            MaxTransparency = 0.1,
+            Smoothness = 0.1, -- Untuk aim yang lebih smooth
+            SmoothnessVariation = 0.05, -- Random smoothness
+            AimAssistStrength = 0.5, -- Kekuatan aim assist
+            TargetPart = "Head",
+            TeamCheck = false,
+            WallCheck = true,
+            MaxDistanceEnabled = false,
+            MaxDistance = 1500,
+            FovColor = Color3.fromRGB(102, 45, 145),
+            ProjectileSpeed = 1000 -- Kecepatan peluru untuk prediksi target bergerak
+        }
 
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/dqtixz/aimbot/main/Projeto%20LKA%20x%20F%20Hub", true))()
-    wait(0.1)
-    l:Notify("Script Load !", "Aim Small", 3)
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/dqtixz/aimbot/main/Projeto%20LKA%20x%20F%20Hub", true))()
+        wait(0.1)
+        l:Notify("Script Load !", "AimBot Active", 3)
 
-    aimAndShoot(config) -- Call the aim and shoot function
-  end
+        aimAndShoot(config) -- Panggil fungsi aim dan shoot dengan konfigurasi
+    end
 })
 
 local Main = MakeTab({Name = "Aim (Torso)"})
