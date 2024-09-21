@@ -125,6 +125,7 @@ local Main = MakeTab({Name = "Aim (Head)"})
 wait(1)
 local Paragraph = AddParagraph(Main, {"Script Only WallCheck No Team Check !", "Aim (Head, Torso) Small, Medium, Big - Esp Player Speed, Inf Jump"})
 wait(1)
+
 local function aimAndShoot(config)
     _G.config = config
 
@@ -132,7 +133,7 @@ local function aimAndShoot(config)
     local camera = game.Workspace.CurrentCamera
     local targetPlayer = nil
 
-    -- Prediksi untuk target yang bergerak
+    -- Predict position for moving targets
     local function predictPosition(target)
         local targetPart = target.Character[config.TargetPart]
         local targetVelocity = target.Character.HumanoidRootPart.Velocity
@@ -140,19 +141,26 @@ local function aimAndShoot(config)
         return targetPart.Position + targetVelocity * predictionTime
     end
 
-    -- Aim assist dengan kekuatan kustom
+    -- Aim assist with custom strength
     local function aimAssist(targetPos, currentPos)
         local aimStrength = config.AimAssistStrength
         return currentPos:Lerp(targetPos, aimStrength)
     end
 
-    -- Random smoothness untuk anti-deteksi
+    -- Random smoothness for anti-detection
     local function randomSmoothAim(targetPos, currentPos)
         local smoothSpeed = config.Smoothness + math.random() * config.SmoothnessVariation
         return currentPos:Lerp(targetPos, smoothSpeed)
     end
 
-    -- Prioritas target: pilih target terdekat
+    -- Wall check to avoid hitting through walls
+    local function wallCheck(startPos, endPos)
+        local ray = Ray.new(startPos, (endPos - startPos).unit * (startPos - endPos).magnitude)
+        local hitPart = workspace:FindPartOnRay(ray)
+        return not hitPart
+    end
+
+    -- Get closest target
     local function getClosestTarget()
         local closestPlayer = nil
         local shortestDistance = math.huge
@@ -161,7 +169,7 @@ local function aimAndShoot(config)
             if playerInstance ~= player and playerInstance.Character and playerInstance.Character:FindFirstChild(config.TargetPart) then
                 local targetPos = playerInstance.Character[config.TargetPart].Position
                 local distance = (targetPos - player.Character.Head.Position).magnitude
-                if distance < shortestDistance then
+                if distance < shortestDistance and targetValid(playerInstance) then
                     closestPlayer = playerInstance
                     shortestDistance = distance
                 end
@@ -170,11 +178,16 @@ local function aimAndShoot(config)
         return closestPlayer
     end
 
-    -- Indikator untuk target yang kena tembak
+    -- Target validation
+    local function targetValid(target)
+        return not config.TeamCheck or target.Team ~= player.Team
+    end
+
+    -- Highlight target when hit
     local function highlightTarget(target)
-        target.Character.Head.BrickColor = BrickColor.new("Bright red") -- Ubah warna target menjadi merah saat kena tembak
+        target.Character.Head.BrickColor = BrickColor.new("Bright red") -- Change target color to red on hit
         wait(0.1)
-        target.Character.Head.BrickColor = BrickColor.new("White") -- Kembalikan warna setelah beberapa saat
+        target.Character.Head.BrickColor = BrickColor.new("White") -- Reset color after a moment
     end
 
     -- Auto-reload function
@@ -182,66 +195,66 @@ local function aimAndShoot(config)
         local tool = player.Backpack:FindFirstChildOfClass("Tool")
         if tool and tool:FindFirstChild("Ammo") then
             if tool.Ammo.Value <= 0 then
-                tool:Activate() -- Memanggil reload jika ammo habis
-                wait(1) -- Tunggu beberapa saat untuk reload
+                tool:Activate() -- Reload if ammo is empty
+                wait(1) -- Wait a moment for reload
             end
         end
     end
 
-    -- Auto-shoot function (untuk mobile)
+    -- Auto-shoot function
     local function autoShoot(target)
         if target then
-            -- Simulasi tembakan
             local humanoid = target.Parent:FindFirstChild("Humanoid")
             if humanoid and humanoid.Health > 0 then
-                autoReload() -- Cek dan lakukan reload otomatis
-                humanoid:TakeDamage(10) -- Misalnya, memberikan damage langsung
-                highlightTarget(target) -- Tambahkan indikator target kena
+                autoReload() -- Check and auto-reload
+                humanoid:TakeDamage(10) -- Deal damage
+                highlightTarget(target) -- Highlight target hit
             end
         end
     end
 
     -- Main aim loop
     while true do
-        -- Cari target terdekat dan valid (bisa tambahkan TeamCheck dan WallCheck jika diperlukan)
         local closestTarget = getClosestTarget()
 
         if closestTarget and closestTarget.Character and closestTarget.Character:FindFirstChild(config.TargetPart) then
             local targetPos = closestTarget.Character[config.TargetPart].Position
-            local predictedPos = predictPosition(closestTarget) -- Gunakan prediksi posisi target
-            local aimPos = randomSmoothAim(predictedPos, camera.CFrame.Position) -- Aim dengan smoothness acak
-            camera.CFrame = CFrame.new(camera.CFrame.Position, aimAssist(aimPos, camera.CFrame.Position)) -- Aim assist
-            autoShoot(closestTarget.Character[config.TargetPart]) -- Auto-shoot ketika aim mengunci target
+            if wallCheck(camera.CFrame.Position, targetPos) then
+                local predictedPos = predictPosition(closestTarget) -- Predict target position
+                local aimPos = randomSmoothAim(predictedPos, camera.CFrame.Position) -- Aim with random smoothness
+                camera.CFrame = CFrame.new(camera.CFrame.Position, aimAssist(aimPos, camera.CFrame.Position)) -- Aim assist
+                autoShoot(closestTarget.Character[config.TargetPart]) -- Auto-shoot when aiming at target
+            end
         end
 
-        wait(0.01) -- Tambahkan delay untuk optimasi
+        wait(0.01) -- Add delay for optimization
     end
 end
 
--- Button untuk AimBot (Mobile Compatible)
+-- Button for AimBot (Mobile Compatible)
 AddButton(Main, {
     Name = "AimBot",
     Callback = function()
         local config = {
             Fov = 180,
             MaxTransparency = 0.1,
-            Smoothness = 0.1, -- Untuk aim yang lebih smooth
-            SmoothnessVariation = 0.05, -- Random smoothness
-            AimAssistStrength = 0.5, -- Kekuatan aim assist
+            Smoothness = 0.1, -- Smooth aiming
+            SmoothnessVariation = 0.05, -- Random smoothness variation
+            AimAssistStrength = 0.5, -- Aim assist strength
             TargetPart = "Head",
-            TeamCheck = false,
-            WallCheck = true,
-            MaxDistanceEnabled = false,
+            TeamCheck = true, -- Enable/disable team check
+            WallCheck = false, -- Enable/disable wall check
+            MaxDistanceEnabled = false, -- Enable/disable max distance
             MaxDistance = 1500,
             FovColor = Color3.fromRGB(102, 45, 145),
-            ProjectileSpeed = 1000 -- Kecepatan peluru untuk prediksi target bergerak
+            ProjectileSpeed = 1000 -- Projectile speed for predicting moving targets
         }
 
         loadstring(game:HttpGet("https://raw.githubusercontent.com/dqtixz/aimbot/main/Projeto%20LKA%20x%20F%20Hub", true))()
         wait(0.1)
-        l:Notify("Script Load !", "AimBot Active", 3)
+        l:Notify("Script Load!", "AimBot Active", 3)
 
-        aimAndShoot(config) -- Panggil fungsi aim dan shoot dengan konfigurasi
+        aimAndShoot(config) -- Call aim and shoot function with configuration
     end
 })
 
